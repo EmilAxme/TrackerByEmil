@@ -12,7 +12,7 @@ final class DaysSelectCell: UITableViewCell {
     static let reusableIdentifier = "DaysSelectCell"
     private var switchCallback: ((Bool) -> Void)?
     
-    // MARK: - UI Element's
+    // MARK: - UI Elements
     lazy var dayLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
@@ -52,7 +52,7 @@ final class DaysSelectCell: UITableViewCell {
         toggleSwitch.isOn = isOn
     }
     
-    // MARK: - Private functions
+    // MARK: - Private methods
     private func setupUI() {
         contentView.addToView(AllUIStackView)
         

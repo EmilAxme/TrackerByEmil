@@ -8,6 +8,8 @@
 import UIKit
 
 struct TrackerRecord {
+    // MARK: - Properties
+    
     let id: UUID
     let date: Date
 }

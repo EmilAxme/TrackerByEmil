@@ -8,6 +8,9 @@
 import UIKit
 
 final class TrackerViewController: UIViewController {
+
+    // MARK: - Properties
+    
     var categories: [TrackerCategory] = [] {
         didSet {
             updateStubVisibility()
@@ -15,6 +18,14 @@ final class TrackerViewController: UIViewController {
     }
     var completedTrackers: [TrackerRecord] = []
     var currentDate = Date()
+    
+    private var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yy"
+        return formatter
+    }()
+    
+    // MARK: - UI Elements
     
     private lazy var datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
@@ -27,12 +38,6 @@ final class TrackerViewController: UIViewController {
     private lazy var trackerCollection: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         return collectionView
-    }()
-    
-    private var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yy"
-        return formatter
     }()
     
     private lazy var addTrackerButton: UIButton = {
@@ -65,6 +70,13 @@ final class TrackerViewController: UIViewController {
     private lazy var trackerSearchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Поиск"
+        
+        searchBar.backgroundImage = UIImage()
+        
+        searchBar.searchTextField.layer.cornerRadius = 10
+        searchBar.searchTextField.layer.masksToBounds = true
+        searchBar.searchTextField.textColor = .ypBlack
+        
         return searchBar
     }()
     
@@ -97,8 +109,7 @@ final class TrackerViewController: UIViewController {
         return stackView
     }()
     
-
-    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,11 +119,13 @@ final class TrackerViewController: UIViewController {
         trackerCollection.delegate = self
         trackerCollection.register(CustomTrackerCell.self, forCellWithReuseIdentifier: CustomTrackerCell.reuseIdentifier)
         trackerCollection.register(HeaderOfSection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderOfSection.reuseIdentifier)
+        
         setupUI()
     }
     
+    // MARK: - Private Methods
+    
     private func setupUI() {
-        
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapDone))
         view.addGestureRecognizer(tapGesture)
         
@@ -122,7 +135,7 @@ final class TrackerViewController: UIViewController {
          stubStackView,
          addTrackerButton
         ].forEach {
-            view.addToView( $0 )
+            view.addToView($0)
         }
         
         let screenSize = UIScreen.main.bounds.size
@@ -158,7 +171,6 @@ final class TrackerViewController: UIViewController {
             trackerCollection.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             trackerCollection.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
-        
     }
     
     private func commitCompletedTracker(id: UUID) {
@@ -172,10 +184,6 @@ final class TrackerViewController: UIViewController {
         }
     }
     
-    @objc private func addTrackerButtonAction() {
-        showAddNewTrackerVC()
-    }
-    
     private func showAddNewTrackerVC() {
         let secondVC = AddTrackerViewController()
         secondVC.delegate = self
@@ -183,42 +191,15 @@ final class TrackerViewController: UIViewController {
         present(navController, animated: true)
     }
     
-    func addNewTracker(id: UUID, name: String, color: UIColor, emoji: String, categoryTitle: String) {
-        let newTracker = Tracker(id: id, name: name, color: color, emoji: emoji)
-        
-        // Новый массив категорий
-        var newCategories: [TrackerCategory] = []
-        
-        var categoryWasUpdated = false
-        
-        for category in categories {
-            if category.title == categoryTitle {
-                // Создаём новый массив трекеров (добавляем к старым новый)
-                let updatedTrackers = category.trackerOfCategory + [newTracker]
-                let updatedCategory = TrackerCategory(title: category.title, trackerOfCategory: updatedTrackers)
-                newCategories.append(updatedCategory)
-                categoryWasUpdated = true
-            } else {
-                // Копируем старую категорию без изменений
-                newCategories.append(category)
-            }
-        }
-        
-        // Если категории ещё не было — создаём новую
-        if !categoryWasUpdated {
-            let newCategory = TrackerCategory(title: categoryTitle, trackerOfCategory: [newTracker])
-            newCategories.append(newCategory)
-        }
-        
-        // Заменяем старый массив на новый
-        categories = newCategories
-        trackerCollection.reloadData()
-        stubStackView.isHidden = true
-    }
-    
     private func updateStubVisibility() {
         let hasTrackers = categories.contains { !$0.trackerOfCategory.isEmpty }
         stubStackView.isHidden = hasTrackers
+    }
+    
+    // MARK: - Actions
+    
+    @objc private func addTrackerButtonAction() {
+        showAddNewTrackerVC()
     }
     
     @objc private func tapDone() {
@@ -230,10 +211,40 @@ final class TrackerViewController: UIViewController {
         currentDate = datePicker.date
         dateField.text = dateFormatter.string(from: currentDate)
     }
+    
+    // MARK: - Public Methods
+    
+    func addNewTracker(id: UUID, name: String, color: UIColor, emoji: String, categoryTitle: String) {
+        let newTracker = Tracker(id: id, name: name, color: color, emoji: emoji)
+        
+        var newCategories: [TrackerCategory] = []
+        var categoryWasUpdated = false
+        
+        for category in categories {
+            if category.title == categoryTitle {
+                let updatedTrackers = category.trackerOfCategory + [newTracker]
+                let updatedCategory = TrackerCategory(title: category.title, trackerOfCategory: updatedTrackers)
+                newCategories.append(updatedCategory)
+                categoryWasUpdated = true
+            } else {
+                newCategories.append(category)
+            }
+        }
+        
+        if !categoryWasUpdated {
+            let newCategory = TrackerCategory(title: categoryTitle, trackerOfCategory: [newTracker])
+            newCategories.append(newCategory)
+        }
+        
+        categories = newCategories
+        trackerCollection.reloadData()
+        stubStackView.isHidden = true
+    }
 }
 
+// MARK: - UICollectionViewDataSource
+
 extension TrackerViewController: UICollectionViewDataSource {
-    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return categories.count
     }
@@ -255,19 +266,25 @@ extension TrackerViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard let header = trackerCollection.dequeueReusableSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: HeaderOfSection.reuseIdentifier,
+            for: indexPath
+        ) as? HeaderOfSection else {
+            fatalError("Failed to deque HeaderOfSection")
+        }
         
-        guard let header = trackerCollection.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderOfSection.reuseIdentifier, for: indexPath) as? HeaderOfSection else { fatalError("Failed to deque HeaderOfSection") }
         header.categoryTitle.text = categories[indexPath.section].title
         return header
     }
-    
 }
 
+// MARK: - UICollectionViewDelegateFlowLayout
+
 extension TrackerViewController: UICollectionViewDelegateFlowLayout {
-    
     func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       sizeForItemAt indexPath: IndexPath) -> CGSize {
         let spacing: CGFloat = 9
         let horizontalInset: CGFloat = 16
         let numberOfItemsInRow: CGFloat = 2
@@ -276,45 +293,47 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
         let totalInsets = horizontalInset * 2
         let availableWidth = collectionView.bounds.width - totalSpacing - totalInsets
         let itemWidth = availableWidth / numberOfItemsInRow
-        let itemHeight = itemWidth * 0.8 // Или своё значение
+        let itemHeight = itemWidth * 0.8
 
         return CGSize(width: itemWidth, height: itemHeight)
     }
 
     func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 9
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+    func collectionView(_ collectionView: UICollectionView,
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 0
     }
     
     func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        insetForSectionAt section: Int) -> UIEdgeInsets {
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
     }
     
     func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        referenceSizeForHeaderInSection section: Int) -> CGSize {
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: 50, height: 50)
     }
     
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+    func collectionView(_ collectionView: UICollectionView,
+                       contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
+                       point: CGPoint) -> UIContextMenuConfiguration? {
         guard indexPaths.count > 0 else { return nil }
         
         let indexPath = indexPaths[0]
         
         return UIContextMenuConfiguration(actionProvider: { action in
             return UIMenu(children: [
-                UIAction(title: "Bold") { [weak self] _ in                },
-                UIAction(title: "Italic") { [weak self] _ in
-                },
-                UIAction(title: "Both") { [weak self] _ in
-                }
+                UIAction(title: "Bold") { _ in },
+                UIAction(title: "Italic") { _ in },
+                UIAction(title: "Both") { _ in }
             ])
         })
     }

@@ -8,11 +8,15 @@
 import UIKit
 
 final class CustomTrackerCell: UICollectionViewCell {
-    static let reuseIdentifier = "CustomTrackerCell"
 
+    // MARK: - Properties
+    
+    static let reuseIdentifier = "CustomTrackerCell"
     var dayCount = 0
     
-    lazy var emojiLabel: UILabel = {
+    // MARK: - UI Elements
+    
+    private lazy var emojiLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17)
         label.textAlignment = .center
@@ -22,21 +26,21 @@ final class CustomTrackerCell: UICollectionViewCell {
         return label
     }()
     
-    lazy var trackerName: UILabel = {
+    private lazy var trackerName: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = .ypWhite
         return label
     }()
 
-    lazy var daysCountLabel: UILabel = {
+    private lazy var daysCountLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12)
         label.text = "\(dayCount) дней"
         return label
     }()
 
-    lazy var doneButton: UIButton = {
+    private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 10, weight: .bold)
         let image = UIImage(systemName: "plus", withConfiguration: config)
@@ -55,13 +59,15 @@ final class CustomTrackerCell: UICollectionViewCell {
         return button
     }()
 
-    lazy var nameAndEmojiView: UIView = {
+    private lazy var nameAndEmojiView: UIView = {
         let view = UIView()
         view.backgroundColor = .yellow
         view.layer.cornerRadius = 16
         view.clipsToBounds = true
         return view
     }()
+    
+    // MARK: - Lifecycle
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -72,8 +78,9 @@ final class CustomTrackerCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Private Methods
+    
     private func setupUI() {
-        
         contentView.layer.cornerRadius = 16
         contentView.clipsToBounds = true
         
@@ -84,7 +91,6 @@ final class CustomTrackerCell: UICollectionViewCell {
         contentView.addToView(doneButton)
         
         NSLayoutConstraint.activate([
-            
             nameAndEmojiView.topAnchor.constraint(equalTo: contentView.topAnchor),
             nameAndEmojiView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             nameAndEmojiView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
@@ -109,14 +115,7 @@ final class CustomTrackerCell: UICollectionViewCell {
         ])
     }
     
-    func configure(source: Tracker) {
-        emojiLabel.text = source.emoji
-        trackerName.text = source.name
-        nameAndEmojiView.backgroundColor = source.color
-        doneButton.backgroundColor = source.color
-    }
-    
-    func dayWord(for number: Int) -> String {
+    private func dayWord(for number: Int) -> String {
         let lastTwoDigits = number % 100
         let lastDigit = number % 10
 
@@ -133,6 +132,17 @@ final class CustomTrackerCell: UICollectionViewCell {
             return "дней"
         }
     }
+    
+    // MARK: - Public Methods
+    
+    func configure(source: Tracker) {
+        emojiLabel.text = source.emoji
+        trackerName.text = source.name
+        nameAndEmojiView.backgroundColor = source.color
+        doneButton.backgroundColor = source.color
+    }
+    
+    // MARK: - Actions
     
     @objc private func doneButtonTapped() {
         UIView.animate(withDuration: 0.2, animations: {

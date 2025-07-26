@@ -22,7 +22,7 @@ final class HeaderTrackerEmojiColorSection: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Private functions
+    // MARK: - Private methods
     private func setupUI() {
         categoryTitle.font = .systemFont(ofSize: 19, weight: .bold)
         

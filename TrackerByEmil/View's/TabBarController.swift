@@ -9,11 +9,15 @@ import UIKit
 
 final class TabBarController: UITabBarController {
 
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupTabBar()
     }
+    
+    // MARK: - Private Methods
     
     private func setupTabBar() {
         let storyboard = UIStoryboard(name: "Main", bundle: .main)
@@ -34,7 +38,6 @@ final class TabBarController: UITabBarController {
     
     private func addSeparatorLine() {
         let separatorLine = UIView()
-
         separatorLine.backgroundColor = .lightGray
         
         view.addToView(separatorLine)
@@ -43,7 +46,7 @@ final class TabBarController: UITabBarController {
             separatorLine.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
             separatorLine.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
             separatorLine.bottomAnchor.constraint(equalTo: self.tabBar.topAnchor),
-            separatorLine.heightAnchor.constraint(equalToConstant: 1) // Высота разделителя
+            separatorLine.heightAnchor.constraint(equalToConstant: 1)
         ])
     }
 }

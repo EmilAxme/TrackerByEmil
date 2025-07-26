@@ -11,7 +11,7 @@ class TrackerEmojiColorCell: UICollectionViewCell {
     // MARK: - Properties
     static let reuseIdentifier = "TrackerEmojiColorCell"
     
-    // MARK: - UI Element's
+    // MARK: - UI Elements
     lazy var emojiLabel: UILabel = {
         let emojiLabel = UILabel()
         emojiLabel.font = .systemFont(ofSize: 32, weight: .bold)
@@ -36,7 +36,7 @@ class TrackerEmojiColorCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Private functions
+    // MARK: - Private methods
     private func setupUI() {
         
         [emojiLabel,

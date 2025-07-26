@@ -4,10 +4,17 @@
 //
 //  Created by Emil on 15.06.2025.
 //
+
 import UIKit
 
 final class AddTrackerViewController: UIViewController {
+    
+    // MARK: - Properties
+    
     var delegate: TrackerViewController?
+    
+    // MARK: - UI Elements
+    
     private lazy var addHabitButton: UIButton = {
         let button = UIButton(type: .custom)
         button.backgroundColor = UIColor(named: "Black")
@@ -40,6 +47,8 @@ final class AddTrackerViewController: UIViewController {
         return stackView
     }()
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -47,8 +56,9 @@ final class AddTrackerViewController: UIViewController {
         setupNavigation()
     }
     
+    // MARK: - Private Methods
+    
     private func setupUI() {
-        
         view.addToView(buttonsStackView)
         
         NSLayoutConstraint.activate([
@@ -68,6 +78,8 @@ final class AddTrackerViewController: UIViewController {
     private func setupNavigation() {
         title = "Создание трекера"
     }
+    
+    // MARK: - Actions
     
     @objc private func addHabitButtonAction() {
         let habitVC = CreateTrackerViewController()

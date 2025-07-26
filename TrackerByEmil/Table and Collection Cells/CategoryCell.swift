@@ -13,7 +13,7 @@ final class CategoryCell: UITableViewCell {
     
     static let reusableIdentifier = "CategoryCell"
     
-    // MARK: - UI Element's
+    // MARK: - UI Elements
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
@@ -69,7 +69,7 @@ final class CategoryCell: UITableViewCell {
     }
     
     
-    // MARK: - Private functions
+    // MARK: - Private methods
     private func setupUI() {
         
         [separatorView, AllUIStackView].forEach { contentView.addToView($0) }

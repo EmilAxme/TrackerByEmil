@@ -10,7 +10,7 @@ final class ScheduleCell: UITableViewCell {
     // MARK: - Properties
     static let reusableIdentifier = "ScheduleCell"
     
-    // MARK: - UI Element's
+    // MARK: - UI Elements
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
@@ -45,7 +45,7 @@ final class ScheduleCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Private functions
+    // MARK: - Private methods
     private func setupUI() {
         [AllUIStackView].forEach { contentView.addToView($0) }
         
