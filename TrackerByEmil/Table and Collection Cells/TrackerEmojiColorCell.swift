@@ -9,24 +9,32 @@ import UIKit
 
 final class TrackerEmojiColorCell: UICollectionViewCell {
     
+    // MARK: - Layout Constants
+    
+    private enum Layout {
+        static let cornerRadius: CGFloat = 8
+        static let padding: CGFloat = 6
+        static let emojiSize: CGFloat = 40
+    }
+    
     // MARK: - Properties
     
     static let reuseIdentifier = "TrackerEmojiColorCell"
-    
+
     // MARK: - UI Elements
     
     lazy var emojiLabel: UILabel = {
-        let emojiLabel = UILabel()
-        emojiLabel.font = .systemFont(ofSize: 32, weight: .bold)
-        emojiLabel.textAlignment = .center
-        return emojiLabel
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 32, weight: .bold)
+        label.textAlignment = .center
+        return label
     }()
     
     lazy var colorView: UIView = {
-        let colorView = UIView()
-        colorView.layer.masksToBounds = true
-        colorView.layer.cornerRadius = 8
-        return colorView
+        let view = UIView()
+        view.layer.masksToBounds = true
+        view.layer.cornerRadius = Layout.cornerRadius
+        return view
     }()
     
     // MARK: - Initialization
@@ -44,24 +52,18 @@ final class TrackerEmojiColorCell: UICollectionViewCell {
     // MARK: - Private methods
     
     private func setupUI() {
-        
-        [emojiLabel,
-         colorView].forEach {
-            contentView.addToView($0)
-        }
+        [colorView, emojiLabel].forEach { contentView.addToView($0) }
         
         NSLayoutConstraint.activate([
-            colorView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 6),
-            colorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 6),
-            colorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -6),
-            colorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant:-6),
+            colorView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Layout.padding),
+            colorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Layout.padding),
+            colorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Layout.padding),
+            colorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Layout.padding),
             
-            emojiLabel.heightAnchor.constraint(equalToConstant: 40),
-            emojiLabel.widthAnchor.constraint(equalToConstant: 40),
-            
+            emojiLabel.widthAnchor.constraint(equalToConstant: Layout.emojiSize),
+            emojiLabel.heightAnchor.constraint(equalToConstant: Layout.emojiSize),
             emojiLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             emojiLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }
-    
 }

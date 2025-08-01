@@ -9,6 +9,31 @@ import UIKit
 
 final class TrackerViewController: UIViewController {
 
+    // MARK: - Layout Constants
+    
+    private enum Constants {
+        static let cornerRadius: CGFloat = 8
+        static let smallCornerRadius: CGFloat = 10
+        static let dateFieldWidth: CGFloat = 77
+        static let dateFieldHeight: CGFloat = 34
+        static let buttonSize: CGFloat = 42
+        static let buttonTopPadding: CGFloat = 1
+        static let buttonLeadingPadding: CGFloat = 6
+        static let dateTrailingPadding: CGFloat = 16
+        static let stackViewSpacing: CGFloat = 7
+        static let stubSpacing: CGFloat = 8
+        static let stubImageSize: CGFloat = 80
+        static let stubStackHeight: CGFloat = 106
+        static let collectionTopPadding: CGFloat = 24
+        static let scalingFactor: CGFloat = 0.25
+        static let itemAspectRatio: CGFloat = 0.8
+        static let headerHeight: CGFloat = 50
+        static let headerWidth: CGFloat = 50
+        static let sectionSpacing: CGFloat = 9
+        static let horizontalInset: CGFloat = 16
+        static let itemsInRow: CGFloat = 2
+    }
+    
     // MARK: - Properties
     
     var categories: [TrackerCategory] = [] {
@@ -53,7 +78,7 @@ final class TrackerViewController: UIViewController {
         textField.textAlignment = .center
         textField.text = dateFormatter.string(from: currentDate)
         textField.backgroundColor = UIColor(named: "dateColor")
-        textField.layer.cornerRadius = 8
+        textField.layer.cornerRadius = Constants.cornerRadius
         textField.clipsToBounds = true
         textField.inputView = datePicker
         return textField
@@ -70,20 +95,17 @@ final class TrackerViewController: UIViewController {
     private lazy var trackerSearchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Поиск"
-        
         searchBar.backgroundImage = UIImage()
-        
-        searchBar.searchTextField.layer.cornerRadius = 10
+        searchBar.searchTextField.layer.cornerRadius = Constants.smallCornerRadius
         searchBar.searchTextField.layer.masksToBounds = true
         searchBar.searchTextField.textColor = .ypBlack
-        
         return searchBar
     }()
     
     private lazy var labelAndSearchBarStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [titleLabel, trackerSearchBar])
         stackView.axis = .vertical
-        stackView.spacing = 7
+        stackView.spacing = Constants.stackViewSpacing
         return stackView
     }()
 
@@ -104,7 +126,7 @@ final class TrackerViewController: UIViewController {
     private lazy var stubStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [stubImage, stubLabel])
         stackView.axis = .vertical
-        stackView.spacing = 8
+        stackView.spacing = Constants.stubSpacing
         stackView.alignment = .center
         return stackView
     }()
@@ -140,33 +162,32 @@ final class TrackerViewController: UIViewController {
         
         let screenSize = UIScreen.main.bounds.size
         let diagonal = sqrt(pow(screenSize.width, 2) + pow(screenSize.height, 2))
-        let scalingFactor: CGFloat = 0.25
-        let dynamicTopPadding = diagonal * scalingFactor
+        let dynamicTopPadding = diagonal * Constants.scalingFactor
         
         NSLayoutConstraint.activate([
-            stubImage.widthAnchor.constraint(equalToConstant: 80),
+            stubImage.widthAnchor.constraint(equalToConstant: Constants.stubImageSize),
             
             stubStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             stubStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            stubStackView.heightAnchor.constraint(equalToConstant: 106),
+            stubStackView.heightAnchor.constraint(equalToConstant: Constants.stubStackHeight),
             stubStackView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             stubStackView.topAnchor.constraint(equalTo: trackerSearchBar.bottomAnchor, constant: dynamicTopPadding),
             
-            addTrackerButton.widthAnchor.constraint(equalToConstant: 42),
-            addTrackerButton.heightAnchor.constraint(equalToConstant: 42),
-            addTrackerButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 6),
-            addTrackerButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1),
+            addTrackerButton.widthAnchor.constraint(equalToConstant: Constants.buttonSize),
+            addTrackerButton.heightAnchor.constraint(equalToConstant: Constants.buttonSize),
+            addTrackerButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Constants.buttonLeadingPadding),
+            addTrackerButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.buttonTopPadding),
             
             dateField.centerYAnchor.constraint(equalTo: addTrackerButton.centerYAnchor),
-            dateField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            dateField.widthAnchor.constraint(equalToConstant: 77),
-            dateField.heightAnchor.constraint(equalToConstant: 34),
+            dateField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Constants.dateTrailingPadding),
+            dateField.widthAnchor.constraint(equalToConstant: Constants.dateFieldWidth),
+            dateField.heightAnchor.constraint(equalToConstant: Constants.dateFieldHeight),
             
-            labelAndSearchBarStackView.topAnchor.constraint(equalTo: addTrackerButton.bottomAnchor, constant: 1),
-            labelAndSearchBarStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            labelAndSearchBarStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            labelAndSearchBarStackView.topAnchor.constraint(equalTo: addTrackerButton.bottomAnchor, constant: Constants.buttonTopPadding),
+            labelAndSearchBarStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Constants.horizontalInset),
+            labelAndSearchBarStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Constants.horizontalInset),
             
-            trackerCollection.topAnchor.constraint(equalTo: labelAndSearchBarStackView.bottomAnchor, constant: 24),
+            trackerCollection.topAnchor.constraint(equalTo: labelAndSearchBarStackView.bottomAnchor, constant: Constants.collectionTopPadding),
             trackerCollection.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             trackerCollection.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             trackerCollection.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
@@ -274,13 +295,11 @@ extension TrackerViewController: UICollectionViewDataSource {
         ) as? HeaderOfTrackersSection else {
             print("Не удалось создать HeaderOfTrackersSection")
             return UICollectionReusableView()
-
         }
         
         header.categoryTitle.text = categories[indexPath.section].title
         return header
     }
-    
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
@@ -289,15 +308,11 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
                        layout collectionViewLayout: UICollectionViewLayout,
                        sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let spacing: CGFloat = 9
-        let horizontalInset: CGFloat = 16
-        let numberOfItemsInRow: CGFloat = 2
-
-        let totalSpacing = (numberOfItemsInRow - 1) * spacing
-        let totalInsets = horizontalInset * 2
+        let totalSpacing = (Constants.itemsInRow - 1) * Constants.sectionSpacing
+        let totalInsets = Constants.horizontalInset * 2
         let availableWidth = collectionView.bounds.width - totalSpacing - totalInsets
-        let itemWidth = availableWidth / numberOfItemsInRow
-        let itemHeight = itemWidth * 0.8
+        let itemWidth = availableWidth / Constants.itemsInRow
+        let itemHeight = itemWidth * Constants.itemAspectRatio
 
         return CGSize(width: itemWidth, height: itemHeight)
     }
@@ -305,7 +320,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
                        layout collectionViewLayout: UICollectionViewLayout,
                        minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 9
+        return Constants.sectionSpacing
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -317,13 +332,13 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
                        layout collectionViewLayout: UICollectionViewLayout,
                        insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        return UIEdgeInsets(top: 0, left: Constants.horizontalInset, bottom: 0, right: Constants.horizontalInset)
     }
     
     func collectionView(_ collectionView: UICollectionView,
                        layout collectionViewLayout: UICollectionViewLayout,
                        referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: 50, height: 50)
+        return CGSize(width: Constants.headerWidth, height: Constants.headerHeight)
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -341,5 +356,4 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
             ])
         })
     }
-    
 }

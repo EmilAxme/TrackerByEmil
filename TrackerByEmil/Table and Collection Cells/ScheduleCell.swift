@@ -8,11 +8,21 @@ import UIKit
 
 final class ScheduleCell: UITableViewCell {
     
+    // MARK: - Layout Constants
+    
+    private enum Layout {
+        static let sideInset: CGFloat = 16
+        static let imageSize: CGFloat = 24
+    }
+    
     // MARK: - Properties
     
     static let reusableIdentifier = "ScheduleCell"
     
+
+    
     // MARK: - UI Elements
+    
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
@@ -28,7 +38,7 @@ final class ScheduleCell: UITableViewCell {
         return imageView
     }()
     
-    private lazy var AllUIStackView: UIStackView = {
+    private lazy var allUIStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [titleLabel, accessoryImageView])
         stackView.axis = .horizontal
         stackView.distribution = .fill
@@ -36,7 +46,7 @@ final class ScheduleCell: UITableViewCell {
         return stackView
     }()
     
-    // MARK: - Initialization
+    // MARK: - Init
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -52,16 +62,15 @@ final class ScheduleCell: UITableViewCell {
     // MARK: - Private methods
     
     private func setupUI() {
-        [AllUIStackView].forEach { contentView.addToView($0) }
+        contentView.addToView(allUIStackView)
         
         NSLayoutConstraint.activate([
-            accessoryImageView.widthAnchor.constraint(equalToConstant: 24),
-            accessoryImageView.heightAnchor.constraint(equalToConstant: 24),
+            accessoryImageView.widthAnchor.constraint(equalToConstant: Layout.imageSize),
+            accessoryImageView.heightAnchor.constraint(equalToConstant: Layout.imageSize),
             
-            AllUIStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            AllUIStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            AllUIStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            allUIStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Layout.sideInset),
+            allUIStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Layout.sideInset),
+            allUIStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }
-    
 }

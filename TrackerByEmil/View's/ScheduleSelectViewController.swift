@@ -9,6 +9,18 @@ import UIKit
 
 final class ScheduleSelectViewController: UIViewController {
     
+    // MARK: - Layout Constants
+    
+    private enum Constants {
+        static let cornerRadius: CGFloat = 16
+        static let defaultSpacing: CGFloat = 16
+        static let wideSpacing: CGFloat = 20
+        static let buttonHeight: CGFloat = 60
+        static let cellHeight: CGFloat = 75
+        static let tableHeaderHeight: CGFloat = 1
+        static let separatorInset: CGFloat = 16
+    }
+    
     // MARK: - Properties
     
     var delegate: CreateTrackerViewController?
@@ -18,13 +30,23 @@ final class ScheduleSelectViewController: UIViewController {
     
     private lazy var weekTableView: UITableView = {
         let tableView = UITableView()
-        tableView.layer.cornerRadius = 16
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        tableView.layer.cornerRadius = Constants.cornerRadius
+        tableView.separatorInset = UIEdgeInsets(
+            top: 0,
+            left: Constants.separatorInset,
+            bottom: 0,
+            right: Constants.separatorInset
+        )
         tableView.isScrollEnabled = false
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(DaysSelectCell.self, forCellReuseIdentifier: DaysSelectCell.reusableIdentifier)
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 1))
+        tableView.tableHeaderView = UIView(frame: CGRect(
+            x: 0,
+            y: 0,
+            width: 0,
+            height: Constants.tableHeaderHeight
+        ))
         return tableView
     }()
     
@@ -33,10 +55,9 @@ final class ScheduleSelectViewController: UIViewController {
         button.backgroundColor = .ypBlack
         button.setTitle("Готово", for: .normal)
         button.layer.masksToBounds = true
-        button.layer.cornerRadius = 16
+        button.layer.cornerRadius = Constants.cornerRadius
         button.addTarget(self, action: #selector(readyButtonTapped), for: .touchUpInside)
-        guard let title = button.titleLabel else { return button }
-        title.font = .systemFont(ofSize: 16, weight: .medium)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         return button
     }()
     
@@ -52,22 +73,20 @@ final class ScheduleSelectViewController: UIViewController {
     // MARK: - Private function's
     
     private func setupUI() {
-        
-        [weekTableView,
-         readyButton].forEach {
+        [weekTableView, readyButton].forEach {
             view.addToView($0)
         }
         
         NSLayoutConstraint.activate([
-            weekTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            weekTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            weekTableView.heightAnchor.constraint(equalToConstant: CGFloat(WeekDay.allCases.count * 75)),
-            weekTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            weekTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.defaultSpacing),
+            weekTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.defaultSpacing),
+            weekTableView.heightAnchor.constraint(equalToConstant: CGFloat(WeekDay.allCases.count) * Constants.cellHeight),
+            weekTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.defaultSpacing),
             
-            readyButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            readyButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            readyButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-            readyButton.heightAnchor.constraint(equalToConstant: 60)
+            readyButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.wideSpacing),
+            readyButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.wideSpacing),
+            readyButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Constants.wideSpacing),
+            readyButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight)
         ])
     }
     
@@ -94,7 +113,6 @@ final class ScheduleSelectViewController: UIViewController {
         
         navigationController.popViewController(animated: true)
     }
-    
 }
 
 // MARK: - UITableViewDataSource
@@ -106,9 +124,13 @@ extension ScheduleSelectViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: DaysSelectCell.reusableIdentifier, for: indexPath) as? DaysSelectCell else {
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: DaysSelectCell.reusableIdentifier,
+            for: indexPath
+        ) as? DaysSelectCell else {
             return UITableViewCell()
         }
+        
         let day = WeekDay.allCases[indexPath.row]
         cell.configure(
             with: day,
@@ -123,20 +145,23 @@ extension ScheduleSelectViewController: UITableViewDataSource {
         }
         return cell
     }
-    
 }
 
 // MARK: - UITableViewDelegate
 
 extension ScheduleSelectViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 75
+        return Constants.cellHeight
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == WeekDay.allCases.count - 1 {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+            cell.separatorInset = UIEdgeInsets(
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: .greatestFiniteMagnitude
+            )
         }
     }
-    
 }

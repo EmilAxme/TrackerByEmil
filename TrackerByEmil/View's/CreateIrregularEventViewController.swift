@@ -9,6 +9,20 @@ import UIKit
 
 final class CreateIrregularEventViewController: UIViewController {
     
+    // MARK: - Layout Constants
+    
+    private enum Constants {
+        static let cornerRadius: CGFloat = 16
+        static let defaultSpacing: CGFloat = 24
+        static let smallSpacing: CGFloat = 8
+        static let textFieldHeight: CGFloat = 75
+        static let buttonHeight: CGFloat = 60
+        static let cellHeight: CGFloat = 75
+        static let sidePadding: CGFloat = 16
+        static let wideSidePadding: CGFloat = 20
+        static let textFieldLeftPadding: CGFloat = 16
+    }
+    
     // MARK: - Properties
     
     var delegate: TrackerViewController?
@@ -20,8 +34,8 @@ final class CreateIrregularEventViewController: UIViewController {
         let textField = UITextField()
         textField.placeholder = "Введите название трекера"
         textField.backgroundColor = .ypBackground
-        textField.layer.cornerRadius = 16
-        textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
+        textField.layer.cornerRadius = Constants.cornerRadius
+        textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: Constants.textFieldLeftPadding, height: textField.frame.height))
         textField.leftViewMode = .always
         textField.clearButtonMode = .whileEditing
         textField.returnKeyType = .done
@@ -31,7 +45,7 @@ final class CreateIrregularEventViewController: UIViewController {
     
     private lazy var categoryTableView: UITableView = {
         let tableView = UITableView()
-        tableView.layer.cornerRadius = 16
+        tableView.layer.cornerRadius = Constants.cornerRadius
         tableView.isScrollEnabled = false
         tableView.dataSource = self
         tableView.delegate = self
@@ -45,12 +59,11 @@ final class CreateIrregularEventViewController: UIViewController {
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Отменить", for: .normal)
-        guard let title = button.titleLabel else { return button }
-        title.font = .systemFont(ofSize: 16, weight: .medium)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .clear
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.ypRed.cgColor
-        button.layer.cornerRadius = 16
+        button.layer.cornerRadius = Constants.cornerRadius
         button.setTitleColor(.ypRed, for: .normal)
         button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -60,10 +73,9 @@ final class CreateIrregularEventViewController: UIViewController {
     private lazy var createButton: UIButton = {
         let button = UIButton()
         button.setTitle("Создать", for: .normal)
-        guard let title = button.titleLabel else { return button }
-        title.font = .systemFont(ofSize: 16, weight: .medium)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .ypGray
-        button.layer.cornerRadius = 16
+        button.layer.cornerRadius = Constants.cornerRadius
         button.setTitleColor(.ypWhite, for: .normal)
         button.isEnabled = false
         button.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
@@ -73,7 +85,7 @@ final class CreateIrregularEventViewController: UIViewController {
     private lazy var buttonsStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [cancelButton, createButton])
         stackView.axis = .horizontal
-        stackView.spacing = 8
+        stackView.spacing = Constants.smallSpacing
         stackView.distribution = .fillEqually
         return stackView
     }()
@@ -97,20 +109,20 @@ final class CreateIrregularEventViewController: UIViewController {
         }
         
         NSLayoutConstraint.activate([
-            trackerNameTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
-            trackerNameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            trackerNameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            trackerNameTextField.heightAnchor.constraint(equalToConstant: 75),
+            trackerNameTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.defaultSpacing),
+            trackerNameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.sidePadding),
+            trackerNameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.sidePadding),
+            trackerNameTextField.heightAnchor.constraint(equalToConstant: Constants.textFieldHeight),
             
-            categoryTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
-            categoryTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            categoryTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            categoryTableView.heightAnchor.constraint(equalToConstant: 75),
+            categoryTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: Constants.defaultSpacing),
+            categoryTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.sidePadding),
+            categoryTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.sidePadding),
+            categoryTableView.heightAnchor.constraint(equalToConstant: Constants.cellHeight),
             
-            buttonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            buttonsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            buttonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.wideSidePadding),
+            buttonsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.wideSidePadding),
             buttonsStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            buttonsStackView.heightAnchor.constraint(equalToConstant: 60)
+            buttonsStackView.heightAnchor.constraint(equalToConstant: Constants.buttonHeight)
         ])
     }
     
@@ -139,7 +151,6 @@ final class CreateIrregularEventViewController: UIViewController {
         delegate?.addNewTracker(id: mockUUID, name: trackerNameTextField.text ?? "", color: .ypRed, emoji: "❤️", categoryTitle: "Важное")
         dismiss(animated: true)
     }
-    
 }
 
 // MARK: - UITextFieldDelegate
@@ -153,7 +164,6 @@ extension CreateIrregularEventViewController: UITextFieldDelegate {
     func textFieldDidChangeSelection(_ textField: UITextField) {
         updateCreateButtonState()
     }
-    
 }
 
 // MARK: - UITableViewDataSource
@@ -172,14 +182,12 @@ extension CreateIrregularEventViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         1
     }
-    
 }
 
 // MARK: - UITableViewDelegate
 
 extension CreateIrregularEventViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        75
+        Constants.cellHeight
     }
-    
 }

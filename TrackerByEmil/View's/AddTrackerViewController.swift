@@ -9,6 +9,14 @@ import UIKit
 
 final class AddTrackerViewController: UIViewController {
     
+    // MARK: - Layout Constants
+    
+    private enum Layout {
+        static let buttonHeight: CGFloat = 60
+        static let horizontalInset: CGFloat = 20
+        static let stackSpacing: CGFloat = 16
+    }
+    
     // MARK: - Properties
     
     var delegate: TrackerViewController?
@@ -21,8 +29,8 @@ final class AddTrackerViewController: UIViewController {
         button.setTitle("Привычка", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = UIColor(named: "White")
-        button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
+        button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(addHabitButtonAction), for: .touchUpInside)
         return button
     }()
@@ -33,8 +41,8 @@ final class AddTrackerViewController: UIViewController {
         button.setTitle("Нерегулярное событие", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = UIColor(named: "White")
-        button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
+        button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(addIrregularEventButtonAction), for: .touchUpInside)
         return button
     }()
@@ -43,7 +51,7 @@ final class AddTrackerViewController: UIViewController {
         let stackView = UIStackView(arrangedSubviews: [addHabitButton, addTrackerButton])
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
-        stackView.spacing = 16
+        stackView.spacing = Layout.stackSpacing
         return stackView
     }()
     
@@ -62,11 +70,11 @@ final class AddTrackerViewController: UIViewController {
         view.addToView(buttonsStackView)
         
         NSLayoutConstraint.activate([
-            addHabitButton.heightAnchor.constraint(equalToConstant: 60),
-            addTrackerButton.heightAnchor.constraint(equalToConstant: 60),
+            addHabitButton.heightAnchor.constraint(equalToConstant: Layout.buttonHeight),
+            addTrackerButton.heightAnchor.constraint(equalToConstant: Layout.buttonHeight),
             
-            buttonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            buttonsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            buttonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Layout.horizontalInset),
+            buttonsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Layout.horizontalInset),
             buttonsStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
     }
@@ -92,5 +100,4 @@ final class AddTrackerViewController: UIViewController {
         eventVC.delegate = delegate
         navigationController?.pushViewController(eventVC, animated: true)
     }
-    
 }

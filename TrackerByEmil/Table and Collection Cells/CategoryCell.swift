@@ -9,6 +9,15 @@ import UIKit
 
 final class CategoryCell: UITableViewCell {
     
+    // MARK: - Layout Constants
+    
+    private enum Layout {
+        static let accessorySize: CGFloat = 24
+        static let horizontalInset: CGFloat = 16
+        static let verticalSpacing: CGFloat = 2
+        static let separatorHeight: CGFloat = 0.5
+    }
+    
     // MARK: - Properties
     
     static let reusableIdentifier = "CategoryCell"
@@ -46,7 +55,7 @@ final class CategoryCell: UITableViewCell {
     private lazy var labelStackView: UIStackView = {
         let labelStackView = UIStackView(arrangedSubviews: [titleLabel, descriptionLabel])
         labelStackView.axis = .vertical
-        labelStackView.spacing = 2
+        labelStackView.spacing = Layout.verticalSpacing
         return labelStackView
     }()
     
@@ -74,23 +83,21 @@ final class CategoryCell: UITableViewCell {
     // MARK: - Private methods
     
     private func setupUI() {
-        
         [separatorView, AllUIStackView].forEach { contentView.addToView($0) }
         
         NSLayoutConstraint.activate([
-            accessoryImageView.widthAnchor.constraint(equalToConstant: 24),
-            accessoryImageView.heightAnchor.constraint(equalToConstant: 24),
+            accessoryImageView.widthAnchor.constraint(equalToConstant: Layout.accessorySize),
+            accessoryImageView.heightAnchor.constraint(equalToConstant: Layout.accessorySize),
             
-            AllUIStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            AllUIStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            AllUIStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Layout.horizontalInset),
+            AllUIStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Layout.horizontalInset),
             AllUIStackView.topAnchor.constraint(equalTo: contentView.topAnchor),
             AllUIStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
-            separatorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            separatorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            separatorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Layout.horizontalInset),
+            separatorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Layout.horizontalInset),
             separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            separatorView.heightAnchor.constraint(equalToConstant: 0.5)
+            separatorView.heightAnchor.constraint(equalToConstant: Layout.separatorHeight)
         ])
     }
-    
 }
