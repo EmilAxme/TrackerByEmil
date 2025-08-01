@@ -7,11 +7,14 @@
 
 import UIKit
 
-class TrackerEmojiColorCell: UICollectionViewCell {
+final class TrackerEmojiColorCell: UICollectionViewCell {
+    
     // MARK: - Properties
+    
     static let reuseIdentifier = "TrackerEmojiColorCell"
     
     // MARK: - UI Elements
+    
     lazy var emojiLabel: UILabel = {
         let emojiLabel = UILabel()
         emojiLabel.font = .systemFont(ofSize: 32, weight: .bold)
@@ -27,6 +30,7 @@ class TrackerEmojiColorCell: UICollectionViewCell {
     }()
     
     // MARK: - Initialization
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -37,6 +41,7 @@ class TrackerEmojiColorCell: UICollectionViewCell {
     }
     
     // MARK: - Private methods
+    
     private func setupUI() {
         
         [emojiLabel,
