@@ -8,8 +8,6 @@
 import UIKit
 
 struct Tracker {
-    // MARK: - Properties
-    
     let id: UUID
     let name: String
     let color: UIColor

@@ -8,8 +8,6 @@
 import UIKit
 
 struct TrackerCategory {
-    // MARK: - Properties
-    
     let title: String
     let trackerOfCategory: [Tracker]
 }
