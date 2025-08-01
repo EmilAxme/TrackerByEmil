@@ -67,7 +67,8 @@ final class CategoryCell: UITableViewCell {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: coder)
+        assertionFailure("init(coder:) has not been implemented")
     }
     
     // MARK: - Private methods

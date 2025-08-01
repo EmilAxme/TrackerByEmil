@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class HeaderOfSection: UICollectionReusableView {
+final class HeaderOfTrackersSection: UICollectionReusableView {
     static let reuseIdentifier = "CustomTrackerHeader"
     let categoryTitle = UILabel()
     
@@ -17,7 +17,8 @@ final class HeaderOfSection: UICollectionReusableView {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: coder)
+        assertionFailure("init(coder:) has not been implemented")
     }
     
     private func setupUI() {

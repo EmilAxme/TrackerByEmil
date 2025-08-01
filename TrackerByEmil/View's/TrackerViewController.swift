@@ -118,7 +118,7 @@ final class TrackerViewController: UIViewController {
         trackerCollection.dataSource = self
         trackerCollection.delegate = self
         trackerCollection.register(CustomTrackerCell.self, forCellWithReuseIdentifier: CustomTrackerCell.reuseIdentifier)
-        trackerCollection.register(HeaderOfSection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderOfSection.reuseIdentifier)
+        trackerCollection.register(HeaderOfTrackersSection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderOfTrackersSection.reuseIdentifier)
         
         setupUI()
     }
@@ -256,7 +256,8 @@ extension TrackerViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CustomTrackerCell.reuseIdentifier, for: indexPath) as? CustomTrackerCell else {
-            fatalError("Failed to deque CustomTrackerCell")
+            print("Не удалось создать CustomTrackerCell")
+            return UICollectionViewCell()
         }
         
         let tracker = categories[indexPath.section].trackerOfCategory[indexPath.item]
@@ -268,10 +269,12 @@ extension TrackerViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard let header = trackerCollection.dequeueReusableSupplementaryView(
             ofKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: HeaderOfSection.reuseIdentifier,
+            withReuseIdentifier: HeaderOfTrackersSection.reuseIdentifier,
             for: indexPath
-        ) as? HeaderOfSection else {
-            fatalError("Failed to deque HeaderOfSection")
+        ) as? HeaderOfTrackersSection else {
+            print("Не удалось создать HeaderOfTrackersSection")
+            return UICollectionReusableView()
+
         }
         
         header.categoryTitle.text = categories[indexPath.section].title
