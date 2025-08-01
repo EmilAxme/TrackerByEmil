@@ -28,4 +28,5 @@ final class HeaderOfSection: UICollectionReusableView {
             categoryTitle.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12)
         ])
     }
+    
 }

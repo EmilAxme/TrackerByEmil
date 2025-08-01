@@ -139,6 +139,7 @@ final class CreateIrregularEventViewController: UIViewController {
         delegate?.addNewTracker(id: mockUUID, name: trackerNameTextField.text ?? "", color: .ypRed, emoji: "❤️", categoryTitle: "Важное")
         dismiss(animated: true)
     }
+    
 }
 
 // MARK: - UITextFieldDelegate
@@ -152,6 +153,7 @@ extension CreateIrregularEventViewController: UITextFieldDelegate {
     func textFieldDidChangeSelection(_ textField: UITextField) {
         updateCreateButtonState()
     }
+    
 }
 
 // MARK: - UITableViewDataSource
@@ -168,14 +170,16 @@ extension CreateIrregularEventViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        1
     }
+    
 }
 
 // MARK: - UITableViewDelegate
 
 extension CreateIrregularEventViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 75
+        75
     }
+    
 }

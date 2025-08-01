@@ -277,6 +277,7 @@ extension TrackerViewController: UICollectionViewDataSource {
         header.categoryTitle.text = categories[indexPath.section].title
         return header
     }
+    
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
@@ -337,4 +338,5 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
             ])
         })
     }
+    
 }

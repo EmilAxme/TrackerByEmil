@@ -7,7 +7,9 @@
 import UIKit
 
 final class ScheduleCell: UITableViewCell {
+    
     // MARK: - Properties
+    
     static let reusableIdentifier = "ScheduleCell"
     
     // MARK: - UI Elements
@@ -35,6 +37,7 @@ final class ScheduleCell: UITableViewCell {
     }()
     
     // MARK: - Initialization
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -46,6 +49,7 @@ final class ScheduleCell: UITableViewCell {
     }
     
     // MARK: - Private methods
+    
     private func setupUI() {
         [AllUIStackView].forEach { contentView.addToView($0) }
         
@@ -58,4 +62,5 @@ final class ScheduleCell: UITableViewCell {
             AllUIStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }
+    
 }

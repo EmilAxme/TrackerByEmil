@@ -3,6 +3,7 @@ import UIKit
 final class CreateTrackerViewController: UIViewController {
     
     // MARK: - Properties
+    
     private let emojis = [
         "🙂", "😻", "🌺", "🐶", "❤️", "😱",
         "😇", "😡", "🥶", "🤔", "🙌", "🍔",
@@ -31,6 +32,7 @@ final class CreateTrackerViewController: UIViewController {
     var delegate: TrackerViewController?
     
     // MARK: - UI Elements
+    
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         return scrollView
@@ -135,6 +137,7 @@ final class CreateTrackerViewController: UIViewController {
     }()
     
     // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupAppearance()
@@ -143,6 +146,7 @@ final class CreateTrackerViewController: UIViewController {
     }
     
     // MARK: - Private Methods
+    
     private func setupAppearance() {
         view.backgroundColor = .ypWhite
     }
@@ -208,6 +212,7 @@ final class CreateTrackerViewController: UIViewController {
     }
     
     // MARK: - Actions
+    
     @objc private func cancelButtonTapped() {
         dismiss(animated: true)
     }
@@ -239,6 +244,7 @@ final class CreateTrackerViewController: UIViewController {
     }
     
     // MARK: - Update UI
+    
     private func updateCreateButtonStateIfNeeded() {
         let isNameEntered = !(trackerNameTextField.text?.isEmpty ?? true)
         let isEmojiSelected = selectedEmoji != nil
@@ -259,9 +265,11 @@ final class CreateTrackerViewController: UIViewController {
         self.categoryAndScheduleTableView.reloadData()
         updateCreateButtonStateIfNeeded()
     }
+    
 }
 
 // MARK: - UITextFieldDelegate
+
 extension CreateTrackerViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -279,9 +287,11 @@ extension CreateTrackerViewController: UITextFieldDelegate {
     func textFieldDidChangeSelection(_ textField: UITextField) {
         updateCreateButtonStateIfNeeded()
     }
+    
 }
 
 // MARK: - UITableViewDataSource
+
 extension CreateTrackerViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 2
@@ -326,9 +336,11 @@ extension CreateTrackerViewController: UITableViewDataSource {
             }
         }
     }
+    
 }
 
 // MARK: - UITableViewDelegate
+
 extension CreateTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
@@ -345,9 +357,11 @@ extension CreateTrackerViewController: UITableViewDelegate {
             navigationController?.pushViewController(scheduleSelectViewController, animated: true)
         }
     }
+    
 }
 
 // MARK: - UICollectionViewDataSource
+
 extension CreateTrackerViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 2
@@ -386,9 +400,11 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
         header.categoryTitle.text = indexPath.section == 0 ? "Emoji" : "Цвет"
         return header
     }
+    
 }
 
 // MARK: - UICollectionViewDelegate
+
 extension CreateTrackerViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 0 {
@@ -447,16 +463,20 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
         }
         updateCreateButtonStateIfNeeded()
     }
+    
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
+
 extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.bounds.width, height: 50)
     }
+    
 }
 
 // MARK: - UIColor Extension
+
 extension UIColor {
     convenience init(hex: String) {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -472,4 +492,5 @@ extension UIColor {
         
         self.init(red: red, green: green, blue: blue, alpha: 1.0)
     }
+    
 }

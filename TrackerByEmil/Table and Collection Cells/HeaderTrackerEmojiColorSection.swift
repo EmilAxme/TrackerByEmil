@@ -8,11 +8,13 @@
 import UIKit
 
 final class HeaderTrackerEmojiColorSection: UICollectionReusableView {
+    
     // MARK: - Properties
     static let reuseIdentifier = "HeaderTrackerEmojiColorSection"
     let categoryTitle = UILabel()
     
     // MARK: - Initialization
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -23,6 +25,7 @@ final class HeaderTrackerEmojiColorSection: UICollectionReusableView {
     }
     
     // MARK: - Private methods
+    
     private func setupUI() {
         categoryTitle.font = .systemFont(ofSize: 19, weight: .bold)
         
@@ -33,4 +36,5 @@ final class HeaderTrackerEmojiColorSection: UICollectionReusableView {
             categoryTitle.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
+    
 }

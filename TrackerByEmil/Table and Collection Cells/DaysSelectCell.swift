@@ -8,11 +8,14 @@
 import UIKit
 
 final class DaysSelectCell: UITableViewCell {
+    
     // MARK: - Properties
+    
     static let reusableIdentifier = "DaysSelectCell"
     private var switchCallback: ((Bool) -> Void)?
     
     // MARK: - UI Elements
+    
     lazy var dayLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
@@ -35,6 +38,7 @@ final class DaysSelectCell: UITableViewCell {
     }()
     
     // MARK: - Initialization
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -46,6 +50,7 @@ final class DaysSelectCell: UITableViewCell {
     }
     
     // MARK: - Configuration
+    
     func configure(with day: WeekDay, isOn: Bool, switchChanged: @escaping (Bool) -> Void) {
         self.switchCallback = switchChanged
         dayLabel.text = day.fullName
@@ -53,6 +58,7 @@ final class DaysSelectCell: UITableViewCell {
     }
     
     // MARK: - Private methods
+    
     private func setupUI() {
         contentView.addToView(AllUIStackView)
         
@@ -69,8 +75,10 @@ final class DaysSelectCell: UITableViewCell {
     }
     
     // MARK: - Actions
+    
     @objc private func switchValueChanged(_ sender: UISwitch) {
         guard let switchCallback else { return }
         switchCallback(sender.isOn)
     }
+    
 }

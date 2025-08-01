@@ -14,6 +14,7 @@ final class CategoryCell: UITableViewCell {
     static let reusableIdentifier = "CategoryCell"
     
     // MARK: - UI Elements
+    
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .regular)
@@ -58,6 +59,7 @@ final class CategoryCell: UITableViewCell {
     }()
     
     // MARK: - Initialization
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -68,8 +70,8 @@ final class CategoryCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
     // MARK: - Private methods
+    
     private func setupUI() {
         
         [separatorView, AllUIStackView].forEach { contentView.addToView($0) }
@@ -89,4 +91,5 @@ final class CategoryCell: UITableViewCell {
             separatorView.heightAnchor.constraint(equalToConstant: 0.5)
         ])
     }
+    
 }

@@ -157,4 +157,5 @@ final class CustomTrackerCell: UICollectionViewCell {
         dayCount += 1
         daysCountLabel.text = "\(dayCount) \(dayWord(for: dayCount))"
     }
+    
 }
