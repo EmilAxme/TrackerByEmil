@@ -7,42 +7,15 @@
 
 import UIKit
 
-// MARK: - Enum
-enum WeekDay: Int, CaseIterable {
-    case monday = 0, tuesday, wednesday, thursday, friday, saturday, sunday
-    
-    var shortName: String {
-        switch self {
-        case .monday: return "Пн"
-        case .tuesday: return "Вт"
-        case .wednesday: return "Ср"
-        case .thursday: return "Чт"
-        case .friday: return "Пт"
-        case .saturday: return "Сб"
-        case .sunday: return "Вс"
-        }
-    }
-    
-    var fullName: String {
-        switch self {
-        case .monday: return "Понедельник"
-        case .tuesday: return "Вторник"
-        case .wednesday: return "Среда"
-        case .thursday: return "Четверг"
-        case .friday: return "Пятница"
-        case .saturday: return "Суббота"
-        case .sunday: return "Воскресенье"
-        }
-    }
-}
-
 final class ScheduleSelectViewController: UIViewController {
     
     // MARK: - Properties
+    
     var delegate: CreateTrackerViewController?
     var selectedDays: Set<WeekDay> = []
     
     //MARK: - UI Element's
+    
     private lazy var weekTableView: UITableView = {
         let tableView = UITableView()
         tableView.layer.cornerRadius = 16
@@ -68,6 +41,7 @@ final class ScheduleSelectViewController: UIViewController {
     }()
     
     // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -76,6 +50,7 @@ final class ScheduleSelectViewController: UIViewController {
     }
     
     // MARK: - Private function's
+    
     private func setupUI() {
         
         [weekTableView,
@@ -106,6 +81,7 @@ final class ScheduleSelectViewController: UIViewController {
     }
     
     // MARK: - Actions
+    
     @objc private func readyButtonTapped() {
         let selected = Array(selectedDays).sorted(by: { $0.rawValue < $1.rawValue })
         
@@ -118,9 +94,11 @@ final class ScheduleSelectViewController: UIViewController {
         
         navigationController.popViewController(animated: true)
     }
+    
 }
 
 // MARK: - UITableViewDataSource
+
 extension ScheduleSelectViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -145,9 +123,11 @@ extension ScheduleSelectViewController: UITableViewDataSource {
         }
         return cell
     }
+    
 }
 
 // MARK: - UITableViewDelegate
+
 extension ScheduleSelectViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
@@ -158,4 +138,5 @@ extension ScheduleSelectViewController: UITableViewDelegate {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
         }
     }
+    
 }
