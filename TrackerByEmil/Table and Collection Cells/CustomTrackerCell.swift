@@ -193,14 +193,22 @@ final class CustomTrackerCell: UICollectionViewCell {
     // MARK: - Actions
 
     @objc private func doneButtonTapped() {
-        guard let trackerId = trackerId else { return }
-        
         UIView.animate(withDuration: Layout.animationDuration, animations: {
             self.doneButton.layer.opacity = Layout.opacityWhenPressed
         }, completion: { isFinished in
-            if isFinished {
-                self.onDoneButtonTapped?(trackerId)
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                if isFinished {
+                    let config = UIImage.SymbolConfiguration(pointSize: Layout.iconPointSize, weight: .bold)
+                    let image = UIImage(systemName: "checkmark", withConfiguration: config)
+                    self.doneButton.setImage(image, for: .normal)
+                }
             }
         })
+        dayCount += 1
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.daysCountLabel.text = "\(self.dayCount) \(self.dayWord(for: self.dayCount))"
+        }
     }
 }

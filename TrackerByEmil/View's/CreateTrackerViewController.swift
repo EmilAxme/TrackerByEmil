@@ -270,8 +270,11 @@ final class CreateTrackerViewController: UIViewController {
     @objc private func textFieldDidChange(_ textField: UITextField) {
         guard let text = textField.text else { return }
         
-        UIView.animate(withDuration: Constants.animationDuration) {
-            self.characterCounterLabel.alpha = text.count >= Constants.maxCharacterCount ? 1 : 0
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            UIView.animate(withDuration: Constants.animationDuration) {
+                self.characterCounterLabel.alpha = text.count >= Constants.maxCharacterCount ? 1 : 0
+            }
         }
         
         updateCreateButtonStateIfNeeded()
@@ -289,15 +292,22 @@ final class CreateTrackerViewController: UIViewController {
         
         if isFormNowValid != isFormValid {
             isFormValid = isFormNowValid
-            createButton.isEnabled = isFormNowValid
-            createButton.backgroundColor = isFormNowValid ? .ypBlack : .ypGray
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.createButton.isEnabled = isFormNowValid
+                self.createButton.backgroundColor = isFormNowValid ? .ypBlack : .ypGray
+            }
         }
     }
     
     func didChooseSchedule(_ days: [WeekDay]) {
         selectedScheduleDays = days
-        self.categoryAndScheduleTableView.reloadData()
-        updateCreateButtonStateIfNeeded()
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.categoryAndScheduleTableView.reloadData()
+
+        }
+        self.updateCreateButtonStateIfNeeded()
     }
 }
 
@@ -436,61 +446,67 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
 
 extension CreateTrackerViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if indexPath.section == 0 {
-            collectionView.indexPathsForSelectedItems?
-                .filter { $0.section == 0 && $0 != indexPath }
-                .forEach {
-                    collectionView.deselectItem(at: $0, animated: false)
-                    if let previousCell = collectionView.cellForItem(at: $0) as? TrackerEmojiColorCell {
-                        previousCell.contentView.backgroundColor = .clear
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if indexPath.section == 0 {
+                collectionView.indexPathsForSelectedItems?
+                    .filter { $0.section == 0 && $0 != indexPath }
+                    .forEach {
+                        collectionView.deselectItem(at: $0, animated: false)
+                        if let previousCell = collectionView.cellForItem(at: $0) as? TrackerEmojiColorCell {
+                            previousCell.contentView.backgroundColor = .clear
+                        }
+                    }
+                
+                self.selectedEmoji = self.emojis[indexPath.item]
+                
+                if let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiColorCell {
+                    UIView.animate(withDuration: Constants.animationDuration) {
+                        cell.layer.masksToBounds = true
+                        cell.layer.cornerRadius = Constants.emojiCornerRadius
+                        cell.contentView.backgroundColor = .ypLightGray
                     }
                 }
-            
-            selectedEmoji = emojis[indexPath.item]
-            
-            if let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiColorCell {
-                UIView.animate(withDuration: Constants.animationDuration) {
-                    cell.layer.masksToBounds = true
-                    cell.layer.cornerRadius = Constants.emojiCornerRadius
-                    cell.contentView.backgroundColor = .ypLightGray
+                
+            } else if indexPath.section == 1 {
+                collectionView.indexPathsForSelectedItems?
+                    .filter { $0.section == 1 && $0 != indexPath }
+                    .forEach {
+                        collectionView.deselectItem(at: $0, animated: false)
+                        if let previousCell = collectionView.cellForItem(at: $0) as? TrackerEmojiColorCell {
+                            previousCell.layer.borderWidth = 0
+                        }
+                    }
+                
+                self.selectedColor = self.colors[indexPath.item]
+                
+                if let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiColorCell {
+                    UIView.animate(withDuration: Constants.animationDuration) {
+                        cell.layer.borderColor = self.colors[indexPath.item].cgColor
+                        cell.layer.borderWidth = Constants.colorBorderWidth
+                        cell.layer.cornerRadius = Constants.colorCornerRadius
+                    }
                 }
             }
             
-        } else if indexPath.section == 1 {
-            collectionView.indexPathsForSelectedItems?
-                .filter { $0.section == 1 && $0 != indexPath }
-                .forEach {
-                    collectionView.deselectItem(at: $0, animated: false)
-                    if let previousCell = collectionView.cellForItem(at: $0) as? TrackerEmojiColorCell {
-                        previousCell.layer.borderWidth = 0
-                    }
-                }
-            
-            selectedColor = colors[indexPath.item]
-            
-            if let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiColorCell {
-                UIView.animate(withDuration: Constants.animationDuration) {
-                    cell.layer.borderColor = self.colors[indexPath.item].cgColor
-                    cell.layer.borderWidth = Constants.colorBorderWidth
-                    cell.layer.cornerRadius = Constants.colorCornerRadius
-                }
-            }
+            self.updateCreateButtonStateIfNeeded()
         }
-        
-        updateCreateButtonStateIfNeeded()
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        if let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiColorCell {
-            UIView.animate(withDuration: Constants.animationDuration) {
-                if indexPath.section == 0 {
-                    cell.contentView.backgroundColor = .clear
-                } else {
-                    cell.layer.borderWidth = 0
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiColorCell {
+                UIView.animate(withDuration: Constants.animationDuration) {
+                    if indexPath.section == 0 {
+                        cell.contentView.backgroundColor = .clear
+                    } else {
+                        cell.layer.borderWidth = 0
+                    }
                 }
             }
+            self.updateCreateButtonStateIfNeeded()
         }
-        updateCreateButtonStateIfNeeded()
     }
 }
 

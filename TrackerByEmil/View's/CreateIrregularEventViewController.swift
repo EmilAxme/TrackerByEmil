@@ -137,8 +137,11 @@ final class CreateIrregularEventViewController: UIViewController {
     
     private func updateCreateButtonState() {
         let isNameEntered = !(trackerNameTextField.text?.isEmpty ?? true)
-        createButton.isEnabled = isNameEntered
-        createButton.backgroundColor = isNameEntered ? .ypBlack : .ypGray
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.createButton.isEnabled = isNameEntered
+            self.createButton.backgroundColor = isNameEntered ? .ypBlack : .ypGray
+        }
     }
     
     // MARK: - Actions
@@ -148,8 +151,17 @@ final class CreateIrregularEventViewController: UIViewController {
     }
     
     @objc private func createButtonTapped() {
-        delegate?.addNewTracker(id: mockUUID, name: trackerNameTextField.text ?? "", color: .ypRed, emoji: "❤️", categoryTitle: "Важное")
-        dismiss(animated: true)
+        DispatchQueue.main.async {[weak self] in
+            guard let self else { return }
+            self.delegate?.addNewTracker(
+                id: self.mockUUID,
+                name: self.trackerNameTextField.text ?? "",
+                color: .ypRed,
+                emoji: "❤️",
+                categoryTitle: "Важное"
+            )
+            self.dismiss(animated: true)
+        }
     }
 }
 

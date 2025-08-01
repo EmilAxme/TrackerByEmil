@@ -104,14 +104,13 @@ final class ScheduleSelectViewController: UIViewController {
     @objc private func readyButtonTapped() {
         let selected = Array(selectedDays).sorted(by: { $0.rawValue < $1.rawValue })
         
-        guard
-            let delegate,
-            let navigationController
-        else { return }
+        guard let delegate, let navigationController else { return }
         
-        delegate.didChooseSchedule(selected)
-        
-        navigationController.popViewController(animated: true)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            delegate.didChooseSchedule(selected)
+            navigationController.popViewController(animated: true)
+        }
     }
 }
 

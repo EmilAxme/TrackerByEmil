@@ -214,7 +214,10 @@ final class TrackerViewController: UIViewController {
     
     private func updateStubVisibility() {
         let hasTrackers = categories.contains { !$0.trackerOfCategory.isEmpty }
-        stubStackView.isHidden = hasTrackers
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.stubStackView.isHidden = hasTrackers
+        }
     }
     
     // MARK: - Actions
@@ -258,8 +261,11 @@ final class TrackerViewController: UIViewController {
         }
         
         categories = newCategories
-        trackerCollection.reloadData()
-        stubStackView.isHidden = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.trackerCollection.reloadData()
+            self.stubStackView.isHidden = true
+        }
     }
 }
 
