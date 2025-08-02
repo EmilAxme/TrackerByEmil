@@ -28,8 +28,8 @@ final class TabBarController: UITabBarController {
         
         let statisticVC = StatisticViewController()
         
-        mainScreenVC.tabBarItem = UITabBarItem(title: "Главный", image: UIImage(named: "mainTabItem"), selectedImage: nil)
-        statisticVC.tabBarItem = UITabBarItem(title: "Статистика", image: UIImage(named: "statTabItem"), selectedImage: nil)
+        mainScreenVC.tabBarItem = UITabBarItem(title: "Главный", image: UIImage(resource: .mainTabItem), selectedImage: nil)
+        statisticVC.tabBarItem = UITabBarItem(title: "Статистика", image: UIImage(resource: .statTabItem), selectedImage: nil)
         
         self.viewControllers = [mainScreenVC, statisticVC]
         

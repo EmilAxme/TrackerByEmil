@@ -67,7 +67,7 @@ final class TrackerViewController: UIViewController {
     
     private lazy var addTrackerButton: UIButton = {
         let button = UIButton(type: .system)
-        let plusImage = UIImage(named: "plusImage")
+        let plusImage = UIImage(resource: .plus)
         button.addTarget(self, action: #selector(addTrackerButtonAction), for: .touchUpInside)
         button.setImage(plusImage, for: .normal)
         return button
@@ -111,7 +111,7 @@ final class TrackerViewController: UIViewController {
 
     private lazy var stubImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "stubImage")
+        imageView.image = UIImage(resource: .stub)
         return imageView
     }()
     
@@ -261,8 +261,7 @@ final class TrackerViewController: UIViewController {
         }
         
         categories = newCategories
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
+        DispatchQueue.main.async {
             self.trackerCollection.reloadData()
             self.stubStackView.isHidden = true
         }
