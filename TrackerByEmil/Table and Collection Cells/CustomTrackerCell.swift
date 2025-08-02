@@ -30,11 +30,13 @@ final class CustomTrackerCell: UICollectionViewCell {
     // MARK: - Properties
 
     static let reuseIdentifier = "CustomTrackerCell"
-    var dayCount = 0 {
+    
+    private var dayCount = 0 {
         didSet {
             updateDaysCountLabel()
         }
     }
+    private var isTrackerDone = false
     
     var onDoneButtonTapped: ((UUID) -> Void)?
     private var trackerId: UUID?
@@ -193,22 +195,25 @@ final class CustomTrackerCell: UICollectionViewCell {
     // MARK: - Actions
 
     @objc private func doneButtonTapped() {
-        UIView.animate(withDuration: Layout.animationDuration, animations: {
-            self.doneButton.layer.opacity = Layout.opacityWhenPressed
-        }, completion: { isFinished in
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                if isFinished {
-                    let config = UIImage.SymbolConfiguration(pointSize: Layout.iconPointSize, weight: .bold)
-                    let image = UIImage(systemName: "checkmark", withConfiguration: config)
-                    self.doneButton.setImage(image, for: .normal)
-                }
-            }
+        let newIsDone = !isTrackerDone
+        let newOpacity = newIsDone ? Layout.opacityWhenPressed : 1.0
+        let newImageName = newIsDone ? "checkmark" : "plus"
+        let dayCountChange = newIsDone ? 1 : -1
+
+        UIView.animate(withDuration: Layout.animationDuration, animations: { [weak self] in
+            self?.doneButton.layer.opacity = newOpacity
+        }, completion: { [weak self] isFinished in
+            guard let self = self, isFinished else { return }
+            
+            // 3. Обновление изображения кнопки
+            let config = UIImage.SymbolConfiguration(pointSize: Layout.iconPointSize, weight: .bold)
+            self.doneButton.setImage(UIImage(systemName: newImageName, withConfiguration: config), for: .normal)
         })
-        dayCount += 1
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.daysCountLabel.text = "\(self.dayCount) \(self.dayWord(for: self.dayCount))"
-        }
+
+        dayCount = max(0, dayCount + dayCountChange)
+        daysCountLabel.text = "\(dayCount) \(dayWord(for: dayCount))"
+        
+        isTrackerDone = newIsDone
     }
+    
 }
