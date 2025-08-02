@@ -262,7 +262,8 @@ final class CreateTrackerViewController: UIViewController {
             name: name,
             color: selectedColor,
             emoji: selectedEmoji,
-            categoryTitle: "Важное"
+            categoryTitle: "Важное",
+            schedule: selectedScheduleDays
         )
         dismiss(animated: true)
     }

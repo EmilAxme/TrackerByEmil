@@ -7,7 +7,7 @@
 
 // MARK: - Enum
 enum WeekDay: Int, CaseIterable {
-    case monday = 0, tuesday, wednesday, thursday, friday, saturday, sunday
+    case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
     
     var shortName: String {
         switch self {

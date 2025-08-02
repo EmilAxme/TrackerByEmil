@@ -24,7 +24,7 @@ final class CreateIrregularEventViewController: UIViewController {
     }
     
     // MARK: - Properties
-    
+    private var allDays: [WeekDay] = [.friday, .saturday, .sunday, .monday, .tuesday, .wednesday, .thursday]
     var delegate: TrackerViewController?
     let mockUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
     
@@ -158,7 +158,8 @@ final class CreateIrregularEventViewController: UIViewController {
                 name: self.trackerNameTextField.text ?? "",
                 color: .ypRed,
                 emoji: "❤️",
-                categoryTitle: "Важное"
+                categoryTitle: "Важное",
+                schedule: allDays
             )
             self.dismiss(animated: true)
         }
