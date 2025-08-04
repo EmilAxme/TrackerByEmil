@@ -59,22 +59,20 @@ final class TrackerViewController: UIViewController {
         datePicker.maximumDate = Date()
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = UIDatePickerStyle.compact
+        datePicker.locale = Locale(identifier: "ru_RU")
         datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
         return datePicker
     }()
     
-    private lazy var dateField: UITextField = {
-        let textField = UITextField()
-        textField.textAlignment = .center
-        textField.text = dateFormatter.string(from: currentDate)
-        textField.backgroundColor = UIColor(named: "dateColor")
-        textField.layer.cornerRadius = Constants.cornerRadius
-        textField.clipsToBounds = true
-        textField.inputView = datePicker
-        textField.isUserInteractionEnabled = true
-//        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(showDatePicker))
-//        textField.addGestureRecognizer(tapGesture)
-        return textField
+    private lazy var dateLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.text = dateFormatter.string(from: currentDate)
+        label.backgroundColor = UIColor(named: "dateColor")
+        label.layer.cornerRadius = Constants.cornerRadius
+        label.clipsToBounds = true
+        label.isUserInteractionEnabled = false
+        return label
     }()
     
     private lazy var trackerCollection: UICollectionView = {
@@ -153,12 +151,11 @@ final class TrackerViewController: UIViewController {
     // MARK: - Private Methods
     
     private func setupUI() {
-//        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapDone))
-//        view.addGestureRecognizer(tapGesture)
         
         [labelAndSearchBarStackView,
          trackerCollection,
-         dateField,
+         datePicker,
+         dateLabel,
          stubStackView,
          addTrackerButton
         ].forEach {
@@ -183,10 +180,15 @@ final class TrackerViewController: UIViewController {
             addTrackerButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Constants.buttonLeadingPadding),
             addTrackerButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.buttonTopPadding),
             
-            dateField.centerYAnchor.constraint(equalTo: addTrackerButton.centerYAnchor),
-            dateField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Constants.dateTrailingPadding),
-            dateField.widthAnchor.constraint(equalToConstant: Constants.dateFieldWidth),
-            dateField.heightAnchor.constraint(equalToConstant: Constants.dateFieldHeight),
+            dateLabel.centerYAnchor.constraint(equalTo: addTrackerButton.centerYAnchor),
+            dateLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Constants.dateTrailingPadding),
+            dateLabel.widthAnchor.constraint(equalToConstant: Constants.dateFieldWidth),
+            dateLabel.heightAnchor.constraint(equalToConstant: Constants.dateFieldHeight),
+            
+            datePicker.centerYAnchor.constraint(equalTo: addTrackerButton.centerYAnchor),
+            datePicker.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Constants.dateTrailingPadding),
+            datePicker.widthAnchor.constraint(equalToConstant: Constants.dateFieldWidth),
+            datePicker.heightAnchor.constraint(equalToConstant: Constants.dateFieldHeight),
             
             labelAndSearchBarStackView.topAnchor.constraint(equalTo: addTrackerButton.bottomAnchor, constant: Constants.buttonTopPadding),
             labelAndSearchBarStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Constants.horizontalInset),
@@ -218,15 +220,6 @@ final class TrackerViewController: UIViewController {
     }
     
     private func updateStubVisibility() {
-//        let calendar = Calendar.current
-//        let weekday = calendar.component(.weekday, from: currentDate)
-        
-//        let hasVisibleTrackers = categories.contains { category in
-//            category.trackerOfCategory.contains { tracker in
-//                tracker.schedule.contains { $0.rawValue == weekday }
-//            }
-//        }
-        
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             self.stubStackView.isHidden = !visibleCategories.isEmpty
@@ -235,7 +228,7 @@ final class TrackerViewController: UIViewController {
     
     private func updateDateField() {
         currentDate = datePicker.date
-        dateField.text = dateFormatter.string(from: currentDate)
+        dateLabel.text = dateFormatter.string(from: currentDate)
     }
     
     // MARK: - Actions
@@ -243,19 +236,6 @@ final class TrackerViewController: UIViewController {
     @objc private func addTrackerButtonAction() {
         showAddNewTrackerVC()
     }
-    
-//    @objc private func tapDone() {
-//        getDateFromPicker()
-//        view.endEditing(true)
-//    }
-//    
-//    @objc private func showDatePicker() {
-//        dateField.becomeFirstResponder()
-//    }
-    
-//    @objc private func datePickerValueChanged() {
-//        getDateFromPicker()
-//    }
     
     @objc private func dateChanged() {
         let calendar = Calendar.current
@@ -280,14 +260,6 @@ final class TrackerViewController: UIViewController {
         updateDateField()
         trackerCollection.reloadData()
     }
-    
-//    @objc private func getDateFromPicker() {
-//        currentDate = datePicker.date
-//        dateField.text = dateFormatter.string(from: currentDate)
-//        trackerCollection.reloadData()
-//        updateStubVisibility()
-//        dateField.resignFirstResponder()
-//    }
     
     // MARK: - Public Methods
     
@@ -316,7 +288,6 @@ final class TrackerViewController: UIViewController {
         categories = newCategories
         DispatchQueue.main.async {
             self.trackerCollection.reloadData()
-//            self.stubStackView.isHidden = true
         }
     }
 }
@@ -329,14 +300,6 @@ extension TrackerViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        guard section < categories.count else { return 0 }
-//        
-//        let filteredTrackers = categories[section].trackerOfCategory.filter { tracker in
-//            let calendar = Calendar.current
-//            let weekday = calendar.component(.weekday, from: currentDate)
-//            return tracker.schedule.contains { $0.rawValue == weekday }
-//        }
-//        
         return visibleCategories[section].trackerOfCategory.count
     }
     
@@ -346,8 +309,6 @@ extension TrackerViewController: UICollectionViewDataSource {
         }
         
         let category = visibleCategories[indexPath.section].trackerOfCategory[indexPath.row ]
-//        let calendar = Calendar.current
-//        let weekday = calendar.component(.weekday, from: currentDate)
         
         cell.configure(source: category)
         
@@ -364,15 +325,6 @@ extension TrackerViewController: UICollectionViewDataSource {
         }
         
         let titleCategory = visibleCategories[indexPath.section].title
-        
-        
-//        let category = categories[indexPath.section]
-//        let calendar = Calendar.current
-//        let weekday = calendar.component(.weekday, from: currentDate)
-//        
-//        let hasVisibleTrackers = category.trackerOfCategory.contains { tracker in
-//            tracker.schedule.contains { $0.rawValue == weekday }
-//        }
         
         header.categoryTitle.text = titleCategory
         return header
