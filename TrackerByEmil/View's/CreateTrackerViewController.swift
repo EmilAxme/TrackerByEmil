@@ -55,8 +55,6 @@ final class CreateTrackerViewController: UIViewController {
     private var isFormValid: Bool = false
     private var selectedColor: UIColor?
     
-    let mockUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
-    
     var selectedScheduleDays: [WeekDay] = []
     var delegate: TrackerViewController?
     
@@ -258,7 +256,7 @@ final class CreateTrackerViewController: UIViewController {
               let name = trackerNameTextField.text
         else { return }
         delegate.addNewTracker(
-            id: mockUUID,
+            id: UUID(),
             name: name,
             color: selectedColor,
             emoji: selectedEmoji,

@@ -185,6 +185,10 @@ final class CustomTrackerCell: UICollectionViewCell {
         nameAndEmojiView.backgroundColor = source.color
         doneButton.backgroundColor = source.color
     }
+    
+    func isFuture(isActive: Bool) {
+        doneButton.isEnabled = isActive
+    }
 
     func updateCompletionState(isCompleted: Bool) {
         let config = UIImage.SymbolConfiguration(pointSize: Layout.iconPointSize, weight: .bold)

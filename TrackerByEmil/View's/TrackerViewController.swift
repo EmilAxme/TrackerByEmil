@@ -56,7 +56,6 @@ final class TrackerViewController: UIViewController {
     
     private lazy var datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
-        datePicker.maximumDate = Date()
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = UIDatePickerStyle.compact
         datePicker.locale = Locale(identifier: "ru_RU")
@@ -231,13 +230,7 @@ final class TrackerViewController: UIViewController {
         dateLabel.text = dateFormatter.string(from: currentDate)
     }
     
-    // MARK: - Actions
-    
-    @objc private func addTrackerButtonAction() {
-        showAddNewTrackerVC()
-    }
-    
-    @objc private func dateChanged() {
+    private func updateVisibleCategories() {
         let calendar = Calendar.current
         let filteredWeekDay = calendar.component(.weekday, from: datePicker.date)
         
@@ -259,6 +252,16 @@ final class TrackerViewController: UIViewController {
         updateStubVisibility()
         updateDateField()
         trackerCollection.reloadData()
+    }
+    
+    // MARK: - Actions
+    
+    @objc private func addTrackerButtonAction() {
+        showAddNewTrackerVC()
+    }
+    
+    @objc private func dateChanged() {
+        updateVisibleCategories()
     }
     
     // MARK: - Public Methods
@@ -286,8 +289,10 @@ final class TrackerViewController: UIViewController {
         }
         
         categories = newCategories
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             self.trackerCollection.reloadData()
+            self.updateVisibleCategories()
         }
     }
 }
@@ -310,7 +315,10 @@ extension TrackerViewController: UICollectionViewDataSource {
         
         let category = visibleCategories[indexPath.section].trackerOfCategory[indexPath.row ]
         
+        let isFutureDate = datePicker.date > Date()
+        
         cell.configure(source: category)
+        cell.isFuture(isActive: !isFutureDate)
         
         return cell
     }
@@ -368,19 +376,5 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: Constants.headerWidth, height: Constants.headerHeight)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
-                        point: CGPoint) -> UIContextMenuConfiguration? {
-        guard indexPaths.count > 0 else { return nil }
-        
-        return UIContextMenuConfiguration(actionProvider: { action in
-            return UIMenu(children: [
-                UIAction(title: "Bold") { _ in },
-                UIAction(title: "Italic") { _ in },
-                UIAction(title: "Both") { _ in }
-            ])
-        })
     }
 }
