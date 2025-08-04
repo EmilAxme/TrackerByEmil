@@ -41,6 +41,8 @@ final class TrackerViewController: UIViewController {
             updateStubVisibility()
         }
     }
+    var visibleCategories: [TrackerCategory] = []
+    
     var completedTrackers: [TrackerRecord] = []
     var currentDate = Date()
     
@@ -56,9 +58,23 @@ final class TrackerViewController: UIViewController {
         let datePicker = UIDatePicker()
         datePicker.maximumDate = Date()
         datePicker.datePickerMode = .date
-        datePicker.preferredDatePickerStyle = .compact
-        datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
+        datePicker.preferredDatePickerStyle = UIDatePickerStyle.compact
+        datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
         return datePicker
+    }()
+    
+    private lazy var dateField: UITextField = {
+        let textField = UITextField()
+        textField.textAlignment = .center
+        textField.text = dateFormatter.string(from: currentDate)
+        textField.backgroundColor = UIColor(named: "dateColor")
+        textField.layer.cornerRadius = Constants.cornerRadius
+        textField.clipsToBounds = true
+        textField.inputView = datePicker
+        textField.isUserInteractionEnabled = true
+//        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(showDatePicker))
+//        textField.addGestureRecognizer(tapGesture)
+        return textField
     }()
     
     private lazy var trackerCollection: UICollectionView = {
@@ -72,20 +88,6 @@ final class TrackerViewController: UIViewController {
         button.addTarget(self, action: #selector(addTrackerButtonAction), for: .touchUpInside)
         button.setImage(plusImage, for: .normal)
         return button
-    }()
-    
-    private lazy var dateField: UITextField = {
-        let textField = UITextField()
-        textField.textAlignment = .center
-        textField.text = dateFormatter.string(from: currentDate)
-        textField.backgroundColor = UIColor(named: "dateColor")
-        textField.layer.cornerRadius = Constants.cornerRadius
-        textField.clipsToBounds = true
-        textField.inputView = datePicker
-        textField.isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(showDatePicker))
-        textField.addGestureRecognizer(tapGesture)
-        return textField
     }()
     
     private lazy var titleLabel: UILabel = {
@@ -139,7 +141,6 @@ final class TrackerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        currentDate = Date()
         
         trackerCollection.dataSource = self
         trackerCollection.delegate = self
@@ -152,8 +153,8 @@ final class TrackerViewController: UIViewController {
     // MARK: - Private Methods
     
     private func setupUI() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapDone))
-        view.addGestureRecognizer(tapGesture)
+//        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapDone))
+//        view.addGestureRecognizer(tapGesture)
         
         [labelAndSearchBarStackView,
          trackerCollection,
@@ -217,19 +218,24 @@ final class TrackerViewController: UIViewController {
     }
     
     private func updateStubVisibility() {
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: currentDate)
+//        let calendar = Calendar.current
+//        let weekday = calendar.component(.weekday, from: currentDate)
         
-        let hasVisibleTrackers = categories.contains { category in
-            category.trackerOfCategory.contains { tracker in
-                tracker.schedule.contains { $0.rawValue == weekday }
-            }
-        }
+//        let hasVisibleTrackers = categories.contains { category in
+//            category.trackerOfCategory.contains { tracker in
+//                tracker.schedule.contains { $0.rawValue == weekday }
+//            }
+//        }
         
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            self.stubStackView.isHidden = hasVisibleTrackers
+            self.stubStackView.isHidden = !visibleCategories.isEmpty
         }
+    }
+    
+    private func updateDateField() {
+        currentDate = datePicker.date
+        dateField.text = dateFormatter.string(from: currentDate)
     }
     
     // MARK: - Actions
@@ -238,26 +244,50 @@ final class TrackerViewController: UIViewController {
         showAddNewTrackerVC()
     }
     
-    @objc private func tapDone() {
-        getDateFromPicker()
-        view.endEditing(true)
-    }
+//    @objc private func tapDone() {
+//        getDateFromPicker()
+//        view.endEditing(true)
+//    }
+//    
+//    @objc private func showDatePicker() {
+//        dateField.becomeFirstResponder()
+//    }
     
-    @objc private func showDatePicker() {
-        dateField.becomeFirstResponder()
-    }
+//    @objc private func datePickerValueChanged() {
+//        getDateFromPicker()
+//    }
     
-    @objc private func datePickerValueChanged() {
-        getDateFromPicker()
-    }
-    
-    @objc private func getDateFromPicker() {
-        currentDate = datePicker.date
-        dateField.text = dateFormatter.string(from: currentDate)
-        trackerCollection.reloadData()
+    @objc private func dateChanged() {
+        let calendar = Calendar.current
+        let filteredWeekDay = calendar.component(.weekday, from: datePicker.date)
+        
+        visibleCategories = categories.compactMap { category in
+            let trackers = category.trackerOfCategory.filter { tracker in
+                tracker.schedule.contains { weekDay in
+                    weekDay.rawValue == filteredWeekDay
+                } == true
+            }
+            if trackers.isEmpty {
+                return nil
+            }
+            
+            return TrackerCategory(
+                title: category.title,
+                trackerOfCategory: trackers
+            )
+        }
         updateStubVisibility()
-        dateField.resignFirstResponder()
+        updateDateField()
+        trackerCollection.reloadData()
     }
+    
+//    @objc private func getDateFromPicker() {
+//        currentDate = datePicker.date
+//        dateField.text = dateFormatter.string(from: currentDate)
+//        trackerCollection.reloadData()
+//        updateStubVisibility()
+//        dateField.resignFirstResponder()
+//    }
     
     // MARK: - Public Methods
     
@@ -286,7 +316,7 @@ final class TrackerViewController: UIViewController {
         categories = newCategories
         DispatchQueue.main.async {
             self.trackerCollection.reloadData()
-            self.stubStackView.isHidden = true
+//            self.stubStackView.isHidden = true
         }
     }
 }
@@ -295,19 +325,19 @@ final class TrackerViewController: UIViewController {
 
 extension TrackerViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return categories.count
+        return visibleCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard section < categories.count else { return 0 }
-        
-        let filteredTrackers = categories[section].trackerOfCategory.filter { tracker in
-            let calendar = Calendar.current
-            let weekday = calendar.component(.weekday, from: currentDate)
-            return tracker.schedule.contains { $0.rawValue == weekday }
-        }
-        
-        return filteredTrackers.count
+//        guard section < categories.count else { return 0 }
+//        
+//        let filteredTrackers = categories[section].trackerOfCategory.filter { tracker in
+//            let calendar = Calendar.current
+//            let weekday = calendar.component(.weekday, from: currentDate)
+//            return tracker.schedule.contains { $0.rawValue == weekday }
+//        }
+//        
+        return visibleCategories[section].trackerOfCategory.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -315,15 +345,11 @@ extension TrackerViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        let category = categories[indexPath.section]
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: currentDate)
+        let category = visibleCategories[indexPath.section].trackerOfCategory[indexPath.row ]
+//        let calendar = Calendar.current
+//        let weekday = calendar.component(.weekday, from: currentDate)
         
-        let filteredTrackers = category.trackerOfCategory.filter { $0.schedule.contains { $0.rawValue == weekday } }
-        
-        guard indexPath.item < filteredTrackers.count else { return cell }
-        let tracker = filteredTrackers[indexPath.item]
-        cell.configure(source: tracker)
+        cell.configure(source: category)
         
         return cell
     }
@@ -337,15 +363,18 @@ extension TrackerViewController: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        let category = categories[indexPath.section]
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: currentDate)
+        let titleCategory = visibleCategories[indexPath.section].title
         
-        let hasVisibleTrackers = category.trackerOfCategory.contains { tracker in
-            tracker.schedule.contains { $0.rawValue == weekday }
-        }
         
-        header.categoryTitle.text = hasVisibleTrackers ? category.title : nil
+//        let category = categories[indexPath.section]
+//        let calendar = Calendar.current
+//        let weekday = calendar.component(.weekday, from: currentDate)
+//        
+//        let hasVisibleTrackers = category.trackerOfCategory.contains { tracker in
+//            tracker.schedule.contains { $0.rawValue == weekday }
+//        }
+        
+        header.categoryTitle.text = titleCategory
         return header
     }
 }
