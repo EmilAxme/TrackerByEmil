@@ -38,7 +38,7 @@ final class CustomTrackerCell: UICollectionViewCell {
     }
     private var isTrackerDone = false
     
-    var onDoneButtonTapped: ((UUID) -> Void)?
+    var onDoneButtonTapped: ((UUID, Bool) -> Void)?
     private var trackerId: UUID?
 
     // MARK: - UI Elements
@@ -203,21 +203,23 @@ final class CustomTrackerCell: UICollectionViewCell {
         let newOpacity = newIsDone ? Layout.opacityWhenPressed : 1.0
         let newImageName = newIsDone ? "checkmark" : "plus"
         let dayCountChange = newIsDone ? 1 : -1
-
+        
         UIView.animate(withDuration: Layout.animationDuration, animations: { [weak self] in
             self?.doneButton.layer.opacity = newOpacity
         }, completion: { [weak self] isFinished in
             guard let self = self, isFinished else { return }
             
-            // 3. Обновление изображения кнопки
             let config = UIImage.SymbolConfiguration(pointSize: Layout.iconPointSize, weight: .bold)
             self.doneButton.setImage(UIImage(systemName: newImageName, withConfiguration: config), for: .normal)
         })
-
+        
         dayCount = max(0, dayCount + dayCountChange)
         daysCountLabel.text = "\(dayCount) \(dayWord(for: dayCount))"
         
         isTrackerDone = newIsDone
+        if let trackerId = trackerId {
+            onDoneButtonTapped?(trackerId, newIsDone)
+        }
     }
     
 }

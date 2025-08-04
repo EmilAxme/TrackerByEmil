@@ -320,6 +320,18 @@ extension TrackerViewController: UICollectionViewDataSource {
         cell.configure(source: category)
         cell.isFuture(isActive: !isFutureDate)
         
+        cell.onDoneButtonTapped = { [weak self] trackerId, isCompleted in
+            guard let self = self else { return }
+
+            let record = TrackerRecord(id: trackerId, date: self.currentDate)
+
+            if isCompleted {
+                self.completedTrackers.append(record)
+            } else {
+                self.completedTrackers.removeAll { $0.id == trackerId && Calendar.current.isDate($0.date, inSameDayAs: self.currentDate) }
+            }
+        }
+        
         return cell
     }
     
