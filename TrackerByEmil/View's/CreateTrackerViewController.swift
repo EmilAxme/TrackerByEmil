@@ -52,10 +52,10 @@ final class CreateTrackerViewController: UIViewController {
     ]
     
     private var selectedEmoji: String?
-    private var isFormValid: Bool = false
     private var selectedColor: UIColor?
-    
     var selectedScheduleDays: [WeekDay] = []
+    
+    private var isFormValid: Bool = false
     var delegate: TrackerViewController?
     
     // MARK: - UI Elements
@@ -63,11 +63,6 @@ final class CreateTrackerViewController: UIViewController {
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         return scrollView
-    }()
-    
-    private lazy var contentView: UIView = {
-        let view = UIView()
-        return view
     }()
     
     private lazy var characterCounterLabel: UILabel = {
@@ -126,10 +121,10 @@ final class CreateTrackerViewController: UIViewController {
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.allowsMultipleSelection = true
+        collectionView.isScrollEnabled = false
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.isScrollEnabled = false
         collectionView.register(TrackerEmojiColorCell.self, forCellWithReuseIdentifier: TrackerEmojiColorCell.reuseIdentifier)
         collectionView.register(HeaderTrackerEmojiColorSection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderTrackerEmojiColorSection.reuseIdentifier)
         return collectionView
@@ -190,15 +185,14 @@ final class CreateTrackerViewController: UIViewController {
     
     private func setupUI() {
         view.addToView(scrollView)
-        scrollView.addToView(contentView)
         
         textFieldContainer.addToView(trackerNameTextField)
         textFieldContainer.addToView(characterCounterLabel)
         
-        contentView.addToView(textFieldContainer)
-        contentView.addToView(categoryAndScheduleTableView)
-        contentView.addToView(emojiAndColorCollectionView)
-        contentView.addToView(buttonsStackView)
+        scrollView.addToView(textFieldContainer)
+        scrollView.addToView(categoryAndScheduleTableView)
+        scrollView.addToView(emojiAndColorCollectionView)
+        scrollView.addToView(buttonsStackView)
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -206,15 +200,9 @@ final class CreateTrackerViewController: UIViewController {
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
-            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            
-            textFieldContainer.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.defaultSpacing),
-            textFieldContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sidePadding),
-            textFieldContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sidePadding),
+            textFieldContainer.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: Constants.defaultSpacing),
+            textFieldContainer.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Constants.sidePadding),
+            textFieldContainer.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Constants.sidePadding),
             textFieldContainer.heightAnchor.constraint(equalToConstant: Constants.textFieldHeight),
             
             trackerNameTextField.topAnchor.constraint(equalTo: textFieldContainer.topAnchor),
@@ -226,19 +214,19 @@ final class CreateTrackerViewController: UIViewController {
             characterCounterLabel.bottomAnchor.constraint(equalTo: textFieldContainer.bottomAnchor, constant: -Constants.characterCounterBottomPadding),
             
             categoryAndScheduleTableView.topAnchor.constraint(equalTo: textFieldContainer.bottomAnchor, constant: Constants.defaultSpacing),
-            categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sidePadding),
-            categoryAndScheduleTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sidePadding),
+            categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Constants.sidePadding),
+            categoryAndScheduleTableView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Constants.sidePadding),
             categoryAndScheduleTableView.heightAnchor.constraint(equalToConstant: Constants.scheduleTableHeight),
             
             emojiAndColorCollectionView.topAnchor.constraint(equalTo: categoryAndScheduleTableView.bottomAnchor, constant: Constants.largeSpacing),
-            emojiAndColorCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sidePadding),
-            emojiAndColorCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sidePadding),
+            emojiAndColorCollectionView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Constants.sidePadding),
+            emojiAndColorCollectionView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Constants.sidePadding),
             emojiAndColorCollectionView.heightAnchor.constraint(equalToConstant: Constants.collectionViewHeight),
             
             buttonsStackView.topAnchor.constraint(equalTo: emojiAndColorCollectionView.bottomAnchor, constant: Constants.mediumSpacing),
-            buttonsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.wideSidePadding),
-            buttonsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.wideSidePadding),
-            buttonsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            buttonsStackView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Constants.wideSidePadding),
+            buttonsStackView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Constants.wideSidePadding),
+            buttonsStackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             buttonsStackView.heightAnchor.constraint(equalToConstant: Constants.buttonHeight)
         ])
     }
@@ -403,7 +391,7 @@ extension CreateTrackerViewController: UITableViewDelegate {
 
 extension CreateTrackerViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 2
+        2
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -514,24 +502,5 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
 extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.bounds.width, height: Constants.headerHeight)
-    }
-}
-
-// MARK: - UIColor Extension
-
-extension UIColor {
-    convenience init(hex: String) {
-        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
-        
-        var rgb: UInt64 = 0
-        
-        Scanner(string: hexSanitized).scanHexInt64(&rgb)
-        
-        let red = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
-        let green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
-        let blue = CGFloat(rgb & 0x0000FF) / 255.0
-        
-        self.init(red: red, green: green, blue: blue, alpha: 1.0)
     }
 }
