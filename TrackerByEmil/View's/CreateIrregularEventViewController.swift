@@ -58,7 +58,6 @@ final class CreateIrregularEventViewController: UIViewController {
     private var isFormValid: Bool = false
     private var allDays: [WeekDay] = [.friday, .saturday, .sunday, .monday, .tuesday, .wednesday, .thursday]
     var delegate: TrackerViewController?
-    let mockUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
     
     // MARK: - UI Elements
     
