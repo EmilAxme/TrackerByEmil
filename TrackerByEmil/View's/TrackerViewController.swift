@@ -42,8 +42,8 @@ final class TrackerViewController: UIViewController {
         }
     }
     var visibleCategories: [TrackerCategory] = []
-    
     var completedTrackers: [TrackerRecord] = []
+    
     var currentDate = Date()
     
     private var dateFormatter: DateFormatter = {
