@@ -9,6 +9,21 @@ import UIKit
 
 final class TabBarController: UITabBarController {
 
+    // MARK: - Properties
+    
+    private let coreDataStack: CoreDataStackProtocol
+    
+    // MARK: - Initialization
+    
+    init(coreDataStack: CoreDataStackProtocol = CoreDataStack()) {
+        self.coreDataStack = coreDataStack
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -25,6 +40,11 @@ final class TabBarController: UITabBarController {
             assertionFailure("Не удалось инициализировать MainScreenViewController")
             return
         }
+        
+        mainScreenVC.coreDataStack = coreDataStack
+        mainScreenVC.trackerProvider = TrackerProvider(coreDataStack: coreDataStack)
+        mainScreenVC.trackerCategoryProvider = TrackerCategoryProvider(coreDataStack: coreDataStack)
+        mainScreenVC.trackerRecordProvider = TrackerRecordProvider(coreDataStack: coreDataStack)
         
         let statisticVC = StatisticViewController()
         
@@ -49,5 +69,4 @@ final class TabBarController: UITabBarController {
             separatorLine.heightAnchor.constraint(equalToConstant: 1)
         ])
     }
-    
 }
