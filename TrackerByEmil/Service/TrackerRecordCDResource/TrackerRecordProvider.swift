@@ -25,7 +25,7 @@ protocol TrackerRecordProviderProtocol {
 }
 
 final class TrackerRecordProvider: NSObject {
-    private let context: NSManagedObjectContext
+    private let coreDataStack: CoreDataStackProtocol
     weak var delegate: TrackerRecordProviderDelegate?
     
     private var insertedIndexes: IndexSet?
@@ -37,7 +37,7 @@ final class TrackerRecordProvider: NSObject {
         
         let frc = NSFetchedResultsController(
             fetchRequest: request,
-            managedObjectContext: context,
+            managedObjectContext: coreDataStack.context,
             sectionNameKeyPath: nil,
             cacheName: nil
         )
@@ -46,8 +46,8 @@ final class TrackerRecordProvider: NSObject {
         return frc
     }()
     
-    init(context: NSManagedObjectContext, delegate: TrackerRecordProviderDelegate) {
-        self.context = context
+    init(coreDataStack: CoreDataStackProtocol, delegate: TrackerRecordProviderDelegate? = nil) {
+        self.coreDataStack = coreDataStack
         self.delegate = delegate
         super.init()
     }
@@ -67,16 +67,16 @@ extension TrackerRecordProvider: TrackerRecordProviderProtocol {
     }
     
     func addRecord(_ record: TrackerRecord) throws {
-        let recordCD = TrackerRecordCD(context: context)
+        let recordCD = TrackerRecordCD(context: coreDataStack.context)
         recordCD.id = record.id
         recordCD.date = record.date
-        try context.save()
+        try coreDataStack.context.save()
     }
     
     func deleteRecord(at indexPath: IndexPath) throws {
         let record = fetchedResultsController.object(at: indexPath)
-        context.delete(record)
-        try context.save()
+        coreDataStack.context.delete(record)
+        try coreDataStack.context.save()
     }
 }
 

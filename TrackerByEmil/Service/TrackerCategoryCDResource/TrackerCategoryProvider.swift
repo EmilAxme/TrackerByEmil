@@ -25,7 +25,7 @@ protocol TrackerCategoryProviderProtocol {
 }
 
 final class TrackerCategoryProvider: NSObject {
-    private let context: NSManagedObjectContext
+    private let coreDataStack: CoreDataStackProtocol
     weak var delegate: TrackerCategoryProviderDelegate?
     
     private var insertedIndexes: IndexSet?
@@ -37,7 +37,7 @@ final class TrackerCategoryProvider: NSObject {
         
         let frc = NSFetchedResultsController(
             fetchRequest: request,
-            managedObjectContext: context,
+            managedObjectContext: coreDataStack.context,
             sectionNameKeyPath: nil,
             cacheName: nil
         )
@@ -46,8 +46,8 @@ final class TrackerCategoryProvider: NSObject {
         return frc
     }()
     
-    init(context: NSManagedObjectContext, delegate: TrackerCategoryProviderDelegate) {
-        self.context = context
+    init(coreDataStack: CoreDataStackProtocol, delegate: TrackerCategoryProviderDelegate? = nil) {
+        self.coreDataStack = coreDataStack
         self.delegate = delegate
         super.init()
     }
@@ -67,11 +67,11 @@ extension TrackerCategoryProvider: TrackerCategoryProviderProtocol {
     }
     
     func addCategory(_ category: TrackerCategory) throws {
-        let categoryCD = TrackerCategoryCD(context: context)
+        let categoryCD = TrackerCategoryCD(context: coreDataStack.context)
         categoryCD.title = category.title
         
         for tracker in category.trackerOfCategory {
-            let trackerCD = TrackerCD(context: context)
+            let trackerCD = TrackerCD(context: coreDataStack.context)
             trackerCD.id = tracker.id
             trackerCD.name = tracker.name
             trackerCD.emoji = tracker.emoji
@@ -81,13 +81,13 @@ extension TrackerCategoryProvider: TrackerCategoryProviderProtocol {
             trackerCD.category = categoryCD // связь
         }
         
-        try context.save()
+        try coreDataStack.context.save()
     }
     
     func deleteCategory(at indexPath: IndexPath) throws {
         let category = fetchedResultsController.object(at: indexPath)
-        context.delete(category)
-        try context.save()
+        coreDataStack.context.delete(category)
+        try coreDataStack.context.save()
     }
 }
 

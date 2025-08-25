@@ -10,6 +10,8 @@ import CoreData
 struct TrackerStoreUpdate {
     let insertedIndexes: IndexSet
     let deletedIndexes: IndexSet
+    let insertedSections: IndexSet
+    let deletedSections: IndexSet
 }
 
 protocol TrackerProviderDelegate: AnyObject {
@@ -24,16 +26,18 @@ protocol TrackerProviderProtocol {
     func deleteTracker(at indexPath: IndexPath) throws
 }
 
-final class TrackerProvider: NSObject {
+final class TrackerProvider: NSObject, TrackerProviderProtocol {
     enum ProviderError: Error {
         case failedToInitializeContext
     }
     
     weak var delegate: TrackerProviderDelegate?
     
-    private let context: NSManagedObjectContext
+    private let coreDataStack: CoreDataStackProtocol
     private var insertedIndexes: IndexSet?
     private var deletedIndexes: IndexSet?
+    private var insertedSections: IndexSet?
+    private var deletedSections: IndexSet?
     
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCD> = {
         let request: NSFetchRequest<TrackerCD> = TrackerCD.fetchRequest()
@@ -41,8 +45,8 @@ final class TrackerProvider: NSObject {
         
         let frc = NSFetchedResultsController(
             fetchRequest: request,
-            managedObjectContext: context,
-            sectionNameKeyPath: "category.title", // секции по категориям
+            managedObjectContext: coreDataStack.context,
+            sectionNameKeyPath: "category.title",
             cacheName: nil
         )
         frc.delegate = self
@@ -50,14 +54,12 @@ final class TrackerProvider: NSObject {
         return frc
     }()
     
-    init(context: NSManagedObjectContext, delegate: TrackerProviderDelegate) {
-        self.context = context
+    init(coreDataStack: CoreDataStackProtocol, delegate: TrackerProviderDelegate? = nil) {
+        self.coreDataStack = coreDataStack
         self.delegate = delegate
         super.init()
     }
-}
-
-extension TrackerProvider: TrackerProviderProtocol {
+    
     var numberOfSections: Int {
         fetchedResultsController.sections?.count ?? 0
     }
@@ -71,47 +73,69 @@ extension TrackerProvider: TrackerProviderProtocol {
     }
     
     func addTracker(_ tracker: Tracker, to category: TrackerCategoryCD) throws {
-        let trackerCD = TrackerCD(context: context)
+        let trackerCD = TrackerCD(context: coreDataStack.context)
         trackerCD.id = tracker.id
         trackerCD.name = tracker.name
         trackerCD.emoji = tracker.emoji
         trackerCD.color = UIColorMarshalling.hexString(from: tracker.color)
         trackerCD.schedule = tracker.schedule.toData()
+        trackerCD.category = category
         
-        trackerCD.category = category // связь с категорией
-        
-        try context.save()
+        coreDataStack.saveContext()
     }
     
     func deleteTracker(at indexPath: IndexPath) throws {
         let tracker = fetchedResultsController.object(at: indexPath)
-        context.delete(tracker)
-        try context.save()
+        coreDataStack.context.delete(tracker)
+        coreDataStack.saveContext()
     }
 }
 
-// MARK: - NSFetchedResultsControllerDelegate
 extension TrackerProvider: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         insertedIndexes = IndexSet()
         deletedIndexes = IndexSet()
+        insertedSections = IndexSet()
+        deletedSections = IndexSet()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if let inserted = insertedIndexes, let deleted = deletedIndexes {
-            delegate?.didUpdate(TrackerStoreUpdate(insertedIndexes: inserted, deletedIndexes: deleted))
+        if let inserted = insertedIndexes,
+           let deleted = deletedIndexes,
+           let insertedSections = insertedSections,
+           let deletedSections = deletedSections {
+            delegate?.didUpdate(TrackerStoreUpdate(
+                insertedIndexes: inserted,
+                deletedIndexes: deleted,
+                insertedSections: insertedSections,
+                deletedSections: deletedSections
+            ))
         }
         insertedIndexes = nil
         deletedIndexes = nil
+        insertedSections = nil
+        deletedSections = nil
     }
     
-    func controller(
-        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
-        didChange anObject: Any,
-        at indexPath: IndexPath?,
-        for type: NSFetchedResultsChangeType,
-        newIndexPath: IndexPath?
-    ) {
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
+                    didChange sectionInfo: NSFetchedResultsSectionInfo,
+                    atSectionIndex sectionIndex: Int,
+                    for type: NSFetchedResultsChangeType) {
+        switch type {
+        case .insert:
+            insertedSections?.insert(sectionIndex)
+        case .delete:
+            deletedSections?.insert(sectionIndex)
+        default:
+            break
+        }
+    }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
+                    didChange anObject: Any,
+                    at indexPath: IndexPath?,
+                    for type: NSFetchedResultsChangeType,
+                    newIndexPath: IndexPath?) {
         switch type {
         case .insert:
             if let indexPath = newIndexPath {
@@ -122,7 +146,8 @@ extension TrackerProvider: NSFetchedResultsControllerDelegate {
                 deletedIndexes?.insert(indexPath.item)
             }
         default:
-            print("Неверно выбран тип изменения")
+            print("Wrong type: \(type)")
         }
     }
 }
+

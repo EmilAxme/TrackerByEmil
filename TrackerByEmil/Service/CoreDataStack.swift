@@ -8,17 +8,22 @@
 import UIKit
 import CoreData
 
-final class CoreDataStack {
+protocol CoreDataStackProtocol {
+    var context: NSManagedObjectContext { get }
+    func saveContext()
+}
+
+final class CoreDataStack: CoreDataStackProtocol {
     lazy var context = persistentContainer.viewContext
     lazy var persistentContainer: NSPersistentContainer = {
-            let container = NSPersistentContainer(name: "TrackerModels")
-            container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-                if let error = error as NSError? {
-                    print("Unresolved error \(error), \(error.userInfo)")
-                }
-            })
-            return container
-        }()
+        let container = NSPersistentContainer(name: "TrackerModels")
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                print("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        return container
+    }()
     
     func saveContext() {
         if context.hasChanges {
@@ -26,6 +31,7 @@ final class CoreDataStack {
                 try context.save()
             } catch {
                 context.rollback()
+                print("Failed to save context: \(error)")
             }
         }
     }
