@@ -231,6 +231,22 @@ final class CreateTrackerViewController: UIViewController {
         ])
     }
     
+    private func createTracker() -> Tracker? {
+        guard let trackerName = trackerNameTextField.text,
+              let selectedColor = selectedColor,
+              let selectedEmoji = selectedEmoji else {
+            return nil
+        }
+        
+        return Tracker(
+            id: UUID(),
+            name: trackerName,
+            color: selectedColor,
+            emoji: selectedEmoji,
+            schedule: selectedScheduleDays
+        )
+    }
+    
     // MARK: - Actions
     
     @objc private func cancelButtonTapped() {
@@ -238,20 +254,13 @@ final class CreateTrackerViewController: UIViewController {
     }
     
     @objc private func createButtonTapped() {
-        guard let delegate,
-              let selectedColor,
-              let selectedEmoji,
-              let name = trackerNameTextField.text
-        else { return }
-        delegate.addNewTracker(
-            id: UUID(),
-            name: name,
-            color: selectedColor,
-            emoji: selectedEmoji,
-            categoryTitle: "Важное",
-            schedule: selectedScheduleDays
-        )
-        dismiss(animated: true)
+        guard let tracker = createTracker() else { return }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.delegate?.addNewTracker(tracker, to: "Важное")
+            self.dismiss(animated: true)
+        }
     }
     
     @objc private func textFieldDidChange(_ textField: UITextField) {

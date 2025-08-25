@@ -218,6 +218,21 @@ final class CreateIrregularEventViewController: UIViewController {
         }
     }
     
+    private func createTracker() -> Tracker? {
+        guard let trackerName = trackerNameTextField.text,
+              let selectedColor = selectedColor,
+              let selectedEmoji = selectedEmoji else {
+            return nil
+        }
+        
+        return Tracker(
+            id: UUID(),
+            name: trackerName,
+            color: selectedColor,
+            emoji: selectedEmoji,
+            schedule: allDays
+        )
+    }
     // MARK: - Actions
     
     @objc private func cancelButtonTapped() {
@@ -225,16 +240,11 @@ final class CreateIrregularEventViewController: UIViewController {
     }
     
     @objc private func createButtonTapped() {
-        DispatchQueue.main.async {[weak self] in
-            guard let self else { return }
-            self.delegate?.addNewTracker(
-                id: UUID(),
-                name: self.trackerNameTextField.text ?? "",
-                color: selectedColor ?? .ypRed,
-                emoji: selectedEmoji ?? "😄",
-                categoryTitle: "Важное",
-                schedule: allDays
-            )
+        guard let tracker = createTracker() else { return }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.delegate?.addNewTracker(tracker, to: "Важное")
             self.dismiss(animated: true)
         }
     }
