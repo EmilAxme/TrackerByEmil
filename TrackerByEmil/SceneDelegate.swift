@@ -10,7 +10,7 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-    let coreDataStack = CoreDataStack()
+    let coreDataStack = CoreDataStack()  // один общий стек
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -20,9 +20,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let trackerCategoryStore = TrackerCategoryStore(context: coreDataStack.context)
         let trackerRecordStore = TrackerRecordStore(context: coreDataStack.context)
         
-        let tabBarController = TabBarController()
-       
-        window.rootViewController = tabBarController
+        let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
+        
+        let onBoardingViewController = OnboardingViewController()
+        let tabBarController = TabBarController(coreDataStack: coreDataStack)
+        
+//        window.rootViewController = hasSeenOnboarding ? tabBarController : onBoardingViewController
+        
+        window.rootViewController = onBoardingViewController
         
         self.window = window
         window.makeKeyAndVisible()
