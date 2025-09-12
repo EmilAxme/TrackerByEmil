@@ -35,7 +35,7 @@ final class AddTrackerViewController: UIViewController {
         return button
     }()
     
-    private lazy var addTrackerButton: UIButton = {
+    private lazy var addIrregularEventButton: UIButton = {
         let button = UIButton(type: .custom)
         button.backgroundColor = UIColor(named: "Black")
         button.setTitle("Нерегулярное событие", for: .normal)
@@ -48,7 +48,7 @@ final class AddTrackerViewController: UIViewController {
     }()
     
     private lazy var buttonsStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [addHabitButton, addTrackerButton])
+        let stackView = UIStackView(arrangedSubviews: [addHabitButton, addIrregularEventButton])
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
         stackView.spacing = Layout.stackSpacing
@@ -71,7 +71,7 @@ final class AddTrackerViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             addHabitButton.heightAnchor.constraint(equalToConstant: Layout.buttonHeight),
-            addTrackerButton.heightAnchor.constraint(equalToConstant: Layout.buttonHeight),
+            addIrregularEventButton.heightAnchor.constraint(equalToConstant: Layout.buttonHeight),
             
             buttonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Layout.horizontalInset),
             buttonsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Layout.horizontalInset),
