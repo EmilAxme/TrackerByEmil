@@ -160,10 +160,11 @@ final class TrackerViewController: UIViewController {
     
     private func setupDependenciesIfNeeded() {
         let coreDataStack = self.coreDataStack ?? CoreDataStack()
+        let categoryStore = TrackerCategoryStore(context: coreDataStack.context)
         self.coreDataStack = coreDataStack
         
         trackerProvider = trackerProvider ?? TrackerProvider(coreDataStack: coreDataStack)
-        trackerCategoryProvider = trackerCategoryProvider ?? TrackerCategoryProvider(coreDataStack: coreDataStack)
+        trackerCategoryProvider = trackerCategoryProvider ?? TrackerCategoryProvider(store: categoryStore)
         trackerRecordProvider = trackerRecordProvider ?? TrackerRecordProvider(coreDataStack: coreDataStack)
         
         (trackerProvider as? TrackerProvider)?.delegate = self
@@ -366,7 +367,8 @@ final class TrackerViewController: UIViewController {
             return existing
         } else {
             let newCategory = TrackerCategory(title: title, trackerOfCategory: [])
-            try trackerCategoryProvider?.addCategory(newCategory)
+            let store = TrackerCategoryStore(context: coreDataStack.context)
+            try store.addCategory(newCategory)
             return try coreDataStack.context.fetch(request).first
                 ?? { throw NSError(domain: "TrackerError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Не удалось создать категорию"]) }()
         }
@@ -385,7 +387,7 @@ final class TrackerViewController: UIViewController {
     // MARK: - Public Methods
     
     func addNewTracker(_ tracker: Tracker, to categoryTitle: String) {
-        guard let trackerProvider, let trackerCategoryProvider else {
+        guard let trackerProvider else {
             assertionFailure("Dependencies are not initialized")
             return
         }

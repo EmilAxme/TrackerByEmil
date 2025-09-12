@@ -40,10 +40,11 @@ final class TabBarController: UITabBarController {
             assertionFailure("Не удалось инициализировать MainScreenViewController")
             return
         }
+        let categoryStore = TrackerCategoryStore(context: coreDataStack.context)
         
         mainScreenVC.coreDataStack = coreDataStack
         mainScreenVC.trackerProvider = TrackerProvider(coreDataStack: coreDataStack)
-        mainScreenVC.trackerCategoryProvider = TrackerCategoryProvider(coreDataStack: coreDataStack)
+        mainScreenVC.trackerCategoryProvider = TrackerCategoryProvider(store: categoryStore)
         mainScreenVC.trackerRecordProvider = TrackerRecordProvider(coreDataStack: coreDataStack)
         
         let statisticVC = StatisticViewController()
