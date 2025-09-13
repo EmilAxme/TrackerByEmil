@@ -285,8 +285,9 @@ final class CreateTrackerViewController: UIViewController {
         let isEmojiSelected = selectedEmoji != nil
         let isColorSelected = selectedColor != nil
         let isScheduleSelected = !selectedScheduleDays.isEmpty
+        let trackerCategorySelected = !selectedCategory.isEmpty
         
-        let isFormNowValid = isNameEntered && isEmojiSelected && isColorSelected && isScheduleSelected
+        let isFormNowValid = isNameEntered && isEmojiSelected && isColorSelected && isScheduleSelected && trackerCategorySelected
         
         if isFormNowValid != isFormValid {
             isFormValid = isFormNowValid
@@ -410,6 +411,7 @@ extension CreateTrackerViewController: CategorySelectViewControllerDelegate {
         self.selectedCategory = category.title ?? ""  
         DispatchQueue.main.async {
             self.categoryAndScheduleTableView.reloadData()
+            self.updateCreateButtonStateIfNeeded()
         }
     }
 }
