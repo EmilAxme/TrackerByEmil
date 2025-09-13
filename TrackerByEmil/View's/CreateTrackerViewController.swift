@@ -394,12 +394,12 @@ extension CreateTrackerViewController: UITableViewDelegate {
             let vm = CategorySelectViewModel(store: store)
             let categorySelectViewController = CategorySelectViewController(viewModel: vm)
             categorySelectViewController.delegate = self
-            navigationController?.pushViewController(categorySelectViewController, animated: true)
+            present(UINavigationController(rootViewController: categorySelectViewController), animated: true)
         } else {
             let scheduleSelectViewController = ScheduleSelectViewController()
             scheduleSelectViewController.delegate = self
             scheduleSelectViewController.selectedDays = Set(selectedScheduleDays)
-            navigationController?.pushViewController(scheduleSelectViewController, animated: true)
+            present(UINavigationController(rootViewController: scheduleSelectViewController), animated: true)
         }
     }
 }

@@ -209,7 +209,7 @@ final class CategorySelectViewController: UIViewController {
             if let selected = viewModel.selectedCategory {
                 delegate?.didSelectCategory(selected)
             }
-            navigationController?.popViewController(animated: true)
+            dismiss(animated: true)
         } else {
             let createVC = EditCategoryViewController()
             createVC.onSave = { [weak self] newTitle in

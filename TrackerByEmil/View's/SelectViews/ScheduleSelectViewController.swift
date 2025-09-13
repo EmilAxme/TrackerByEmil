@@ -106,10 +106,10 @@ final class ScheduleSelectViewController: UIViewController {
         
         guard let delegate, let navigationController else { return }
         
-        DispatchQueue.main.async { 
+        DispatchQueue.main.async {
             delegate.didChooseSchedule(selected)
-            navigationController.popViewController(animated: true)
         }
+        dismiss(animated: true)
     }
 }
 
