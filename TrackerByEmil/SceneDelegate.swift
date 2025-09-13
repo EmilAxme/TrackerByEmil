@@ -12,23 +12,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
     let coreDataStack = CoreDataStack()  // один общий стек
     
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    func scene(_ scene: UIScene,
+               willConnectTo session: UISceneSession,
+               options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        
-        let trackerStore = TrackerStore(context: coreDataStack.context)
-        let trackerCategoryStore = TrackerCategoryStore(context: coreDataStack.context)
-        let trackerRecordStore = TrackerRecordStore(context: coreDataStack.context)
-        
-        let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
-        
-        let onBoardingViewController = OnboardingViewController()
-        let tabBarController = TabBarController(coreDataStack: coreDataStack)
-        
-//        window.rootViewController = hasSeenOnboarding ? tabBarController : onBoardingViewController
-        
-        window.rootViewController = onBoardingViewController
-        
+
+        if AppSettings.hasSeenOnboarding {
+            // пользователь уже видел онбординг
+            window.rootViewController = TabBarController(coreDataStack: coreDataStack)
+        } else {
+            // показываем онбординг
+            let onBoardingViewController = PageViewController()
+            onBoardingViewController.onFinish = { [weak self] in
+                guard let self = self else { return }
+                AppSettings.hasSeenOnboarding = true
+                let tabBarController = TabBarController(coreDataStack: self.coreDataStack)
+                self.window?.rootViewController = tabBarController
+            }
+            window.rootViewController = onBoardingViewController
+        }
+
         self.window = window
         window.makeKeyAndVisible()
     }
