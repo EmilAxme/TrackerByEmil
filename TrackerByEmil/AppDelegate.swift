@@ -21,20 +21,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
         
-        let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
-        
-        let coreDataStack = CoreDataStack()
-        let onBoardingViewController = OnboardingViewController()
-        let tabBarController = TabBarController(coreDataStack: coreDataStack)
-        
-//        if hasSeenOnboarding {
-//            window?.rootViewController = tabBarController
-//        } else {
-//            window?.rootViewController = onBoardingViewController
-//        }
-        
-        window?.rootViewController = onBoardingViewController
-        
         window?.makeKeyAndVisible()
         return true
     }
