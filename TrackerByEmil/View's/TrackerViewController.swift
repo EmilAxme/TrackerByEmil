@@ -223,39 +223,7 @@ final class TrackerViewController: UIViewController {
         ])
     }
     
-    private func loadTrackersFromCoreData() {
-        guard let trackerProvider = trackerProvider else {
-            print("TrackerProvider не инициализирован")
-            return
-        }
-        
-        // Преобразуем данные из Core Data в формат TrackerCategory
-        var loadedCategories: [TrackerCategory] = []
-        
-        for section in 0..<trackerProvider.numberOfSections {
-            var trackers: [Tracker] = []
-            
-            for row in 0..<trackerProvider.numberOfRowsInSection(section) {
-                let indexPath = IndexPath(row: row, section: section)
-                if let trackerCD = trackerProvider.object(at: indexPath) {
-                    if let tracker = convertToTracker(trackerCD: trackerCD) {
-                        trackers.append(tracker)
-                    }
-                }
-            }
-            
-            if let firstTrackerCD = trackerProvider.object(at: IndexPath(row: 0, section: section)),
-               let categoryTitle = firstTrackerCD.category?.title, !trackers.isEmpty {
-                let category = TrackerCategory(title: categoryTitle, trackerOfCategory: trackers)
-                loadedCategories.append(category)
-            }
-        }
-        
-        categories = loadedCategories
-        updateVisibleCategories()
-        
-        trackerCollection.reloadData()
-    }
+
     
     private func convertToTracker(trackerCD: TrackerCD) -> Tracker? {
         guard let id = trackerCD.id,
@@ -401,6 +369,39 @@ final class TrackerViewController: UIViewController {
         } catch {
             print("Ошибка при сохранении трекера: \(error)")
         }
+    }
+    func loadTrackersFromCoreData() {
+        guard let trackerProvider = trackerProvider else {
+            print("TrackerProvider не инициализирован")
+            return
+        }
+        
+        // Преобразуем данные из Core Data в формат TrackerCategory
+        var loadedCategories: [TrackerCategory] = []
+        
+        for section in 0..<trackerProvider.numberOfSections {
+            var trackers: [Tracker] = []
+            
+            for row in 0..<trackerProvider.numberOfRowsInSection(section) {
+                let indexPath = IndexPath(row: row, section: section)
+                if let trackerCD = trackerProvider.object(at: indexPath) {
+                    if let tracker = convertToTracker(trackerCD: trackerCD) {
+                        trackers.append(tracker)
+                    }
+                }
+            }
+            
+            if let firstTrackerCD = trackerProvider.object(at: IndexPath(row: 0, section: section)),
+               let categoryTitle = firstTrackerCD.category?.title, !trackers.isEmpty {
+                let category = TrackerCategory(title: categoryTitle, trackerOfCategory: trackers)
+                loadedCategories.append(category)
+            }
+        }
+        
+        categories = loadedCategories
+        updateVisibleCategories()
+        
+        trackerCollection.reloadData()
     }
 }
 

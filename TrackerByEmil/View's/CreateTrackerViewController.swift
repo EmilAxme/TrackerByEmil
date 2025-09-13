@@ -251,12 +251,14 @@ final class CreateTrackerViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func cancelButtonTapped() {
+        delegate?.loadTrackersFromCoreData()
         dismiss(animated: true)
     }
     
     @objc private func createButtonTapped() {
         guard let tracker = createTracker() else { return }
         let categoryName = selectedCategory
+        delegate?.loadTrackersFromCoreData()
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
