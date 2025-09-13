@@ -18,19 +18,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
 
-        if AppSettings.hasSeenOnboarding {
-            // пользователь уже видел онбординг
+        if !AppSettings.hasSeenOnboarding {
             window.rootViewController = TabBarController(coreDataStack: coreDataStack)
         } else {
-            // показываем онбординг
-            let onBoardingViewController = PageViewController()
-            onBoardingViewController.onFinish = { [weak self] in
+            let pageViewController = PageViewController()
+            pageViewController.onFinish = { [weak self] in
                 guard let self = self else { return }
                 AppSettings.hasSeenOnboarding = true
                 let tabBarController = TabBarController(coreDataStack: self.coreDataStack)
-                self.window?.rootViewController = tabBarController
+                
+                UIView.transition(with: self.window!,
+                                  duration: 0.3,
+                                  options: .transitionCrossDissolve,
+                                  animations: {
+                    self.window?.rootViewController = tabBarController
+                })
             }
-            window.rootViewController = onBoardingViewController
+            window.rootViewController = pageViewController
         }
 
         self.window = window

@@ -85,11 +85,7 @@ class PageViewController: UIPageViewController {
     // MARK: - Actions
     @objc private func handleJump() {
         UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
-        
-        let coreDataStack = CoreDataStack()
-        let tabBarController = TabBarController(coreDataStack: coreDataStack)
-        tabBarController.modalPresentationStyle = .fullScreen
-        present(tabBarController, animated: true)
+        onFinish?() 
     }
 }
 
