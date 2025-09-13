@@ -178,12 +178,16 @@ final class CustomTrackerCell: UICollectionViewCell {
 
     // MARK: - Public Methods
 
-    func configure(source: Tracker) {
+    func configure(source: Tracker, isCompleted: Bool, dayCount: Int) {
         trackerId = source.id
         emojiLabel.text = source.emoji
         trackerName.text = source.name
         nameAndEmojiView.backgroundColor = source.color
         doneButton.backgroundColor = source.color
+
+        isTrackerDone = isCompleted   // <-- вот это важно
+        updateCompletionState(isCompleted: isCompleted)
+        daysCountLabel.text = "\(dayCount) \(dayWord(for: dayCount))"
     }
     
     func isFuture(isActive: Bool) {
@@ -193,33 +197,18 @@ final class CustomTrackerCell: UICollectionViewCell {
     func updateCompletionState(isCompleted: Bool) {
         let config = UIImage.SymbolConfiguration(pointSize: Layout.iconPointSize, weight: .bold)
         let imageName = isCompleted ? "checkmark" : "plus"
+        doneButton.layer.opacity = isCompleted ? 0.5 : 1
         doneButton.setImage(UIImage(systemName: imageName, withConfiguration: config), for: .normal)
     }
 
     // MARK: - Actions
 
     @objc private func doneButtonTapped() {
-        let newIsDone = !isTrackerDone
-        let newOpacity = newIsDone ? Layout.opacityWhenPressed : 1.0
-        let newImageName = newIsDone ? "checkmark" : "plus"
-        let dayCountChange = newIsDone ? 1 : -1
-        
-        UIView.animate(withDuration: Layout.animationDuration, animations: { [weak self] in
-            self?.doneButton.layer.opacity = newOpacity
-        }, completion: { [weak self] isFinished in
-            guard let self = self, isFinished else { return }
-            
-            let config = UIImage.SymbolConfiguration(pointSize: Layout.iconPointSize, weight: .bold)
-            self.doneButton.setImage(UIImage(systemName: newImageName, withConfiguration: config), for: .normal)
-        })
-        
-        dayCount = max(0, dayCount + dayCountChange)
-        daysCountLabel.text = "\(dayCount) \(dayWord(for: dayCount))"
-        
-        isTrackerDone = newIsDone
-        if let trackerId = trackerId {
-            onDoneButtonTapped?(trackerId, newIsDone)
-        }
+        guard let trackerId = trackerId else { return }
+        // используем локальное состояние, а не systemName
+        let newIsCompleted = !isTrackerDone
+        isTrackerDone = newIsCompleted
+        onDoneButtonTapped?(trackerId, newIsCompleted)
     }
     
 }

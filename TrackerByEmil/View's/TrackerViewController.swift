@@ -421,25 +421,36 @@ extension TrackerViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        let category = visibleCategories[indexPath.section].trackerOfCategory[indexPath.row]
+
         
         let isFutureDate = datePicker.date > Date()
         
-        cell.configure(source: category)
+        let tracker = visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
+
+        let isCompletedToday = completedTrackers.contains {
+            $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
+        }
+        let daysCount = completedTrackers.filter { $0.id == tracker.id }.count
+
+        cell.configure(source: tracker, isCompleted: isCompletedToday, dayCount: daysCount)
         cell.isFuture(isActive: !isFutureDate)
-        
+
         cell.onDoneButtonTapped = { [weak self] trackerId, isCompleted in
             guard let self = self else { return }
-
             let record = TrackerRecord(id: trackerId, date: self.currentDate)
 
             if isCompleted {
                 self.completedTrackers.append(record)
             } else {
-                self.completedTrackers.removeAll { $0.id == trackerId && Calendar.current.isDate($0.date, inSameDayAs: self.currentDate) }
+                self.completedTrackers.removeAll {
+                    $0.id == trackerId && Calendar.current.isDate($0.date, inSameDayAs: self.currentDate)
+                }
             }
+
+            // пересчитываем количество дней
+            let daysCount = self.completedTrackers.filter { $0.id == trackerId }.count
+            cell.configure(source: tracker, isCompleted: isCompleted, dayCount: daysCount)
         }
-        
         return cell
     }
     
