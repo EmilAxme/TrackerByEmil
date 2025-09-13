@@ -37,6 +37,8 @@ final class HeaderOfTrackersSection: UICollectionReusableView {
 
     private func setupUI() {
         addToView(categoryTitle)
+        
+        categoryTitle.font = .systemFont(ofSize: 19, weight: .bold)
 
         NSLayoutConstraint.activate([
             categoryTitle.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Layout.leadingInset),
