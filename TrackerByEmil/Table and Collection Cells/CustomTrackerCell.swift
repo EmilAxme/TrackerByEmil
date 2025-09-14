@@ -188,8 +188,10 @@ final class CustomTrackerCell: UICollectionViewCell {
         isTrackerDone = isCompleted
         updateCompletionState(isCompleted: isCompleted)
 
-        // обновляем сразу, без async
-        daysCountLabel.text = "\(dayCount) \(dayWord(for: dayCount))"
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.daysCountLabel.text = "\(dayCount) \(dayWord(for: dayCount))"
+        }
     }
     
     func isFuture(isActive: Bool) {

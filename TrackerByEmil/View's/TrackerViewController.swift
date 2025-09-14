@@ -156,11 +156,9 @@ final class TrackerViewController: UIViewController {
 
         setupUI()
 
-        // Загружаем категории и записи
         loadTrackersFromCoreData()
         loadCompletedTrackers()
 
-        // Обновляем видимые категории и только потом перерисовываем
         updateVisibleCategories()
     }
     
@@ -372,8 +370,10 @@ final class TrackerViewController: UIViewController {
         do {
             let category = try fetchOrCreateCategory(title: categoryTitle)
             try trackerProvider.addTracker(tracker, to: category)
-            
+        
             updateLocalCategories(with: tracker, categoryTitle: categoryTitle)
+            
+            updateVisibleCategories()
             
         } catch {
             print("Ошибка при сохранении трекера: \(error)")
