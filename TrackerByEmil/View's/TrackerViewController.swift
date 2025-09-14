@@ -154,6 +154,9 @@ final class TrackerViewController: UIViewController {
         
         setupUI()
         loadTrackersFromCoreData()
+        
+        loadCompletedTrackers()
+        trackerCollection.reloadData()
     }
     
     // MARK: - Private Methods
@@ -342,6 +345,11 @@ final class TrackerViewController: UIViewController {
         }
     }
     
+    private func loadCompletedTrackers() {
+        guard let trackerRecordProvider else { return }
+        completedTrackers = trackerRecordProvider.fetchAllRecords()
+    }
+    
     // MARK: - Actions
     
     @objc private func addTrackerButtonAction() {
@@ -397,10 +405,14 @@ final class TrackerViewController: UIViewController {
             }
         }
         
+        // Сохраняем категории
         categories = loadedCategories
-        updateVisibleCategories()
         
-        trackerCollection.reloadData()
+        // ✅ Сначала подтягиваем completedTrackers
+        loadCompletedTrackers()
+        
+        // Потом обновляем видимые категории и коллекцию
+        updateVisibleCategories()
     }
 }
 
@@ -430,24 +442,25 @@ extension TrackerViewController: UICollectionViewDataSource {
             $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
         }
         let daysCount = completedTrackers.filter { $0.id == tracker.id }.count
-
+        
+        print("Первый", daysCount)
+        
         cell.configure(source: tracker, isCompleted: isCompletedToday, dayCount: daysCount)
         cell.isFuture(isActive: !isFutureDate)
 
         cell.onDoneButtonTapped = { [weak self] trackerId, isCompleted in
-            guard let self = self else { return }
+            guard let self else { return }
             let record = TrackerRecord(id: trackerId, date: self.currentDate)
 
-            if isCompleted {
-                self.completedTrackers.append(record)
-            } else {
-                self.completedTrackers.removeAll {
-                    $0.id == trackerId && Calendar.current.isDate($0.date, inSameDayAs: self.currentDate)
+            do {
+                if isCompleted {
+                    try self.trackerRecordProvider?.addRecord(record)
+                } else {
+                    try self.trackerRecordProvider?.removeRecord(record)
                 }
+            } catch {
+                print("Ошибка при изменении записи: \(error)")
             }
-
-            let daysCount = self.completedTrackers.filter { $0.id == trackerId }.count
-            cell.configure(source: tracker, isCompleted: isCompleted, dayCount: daysCount)
         }
         return cell
     }
@@ -531,7 +544,10 @@ extension TrackerViewController: TrackerCategoryProviderDelegate {
 extension TrackerViewController: TrackerRecordProviderDelegate {
     func didUpdate(_ update: TrackerRecordStoreUpdate) {
         DispatchQueue.main.async { [weak self] in
-            self?.loadTrackersFromCoreData()
+            guard let self else { return }
+            // Подтягиваем актуальные записи
+            self.completedTrackers = self.trackerRecordProvider?.fetchAllRecords() ?? []
+            self.trackerCollection.reloadData()
         }
     }
 }
