@@ -18,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
 
-        if !AppSettings.hasSeenOnboarding {
+        if AppSettings.hasSeenOnboarding {
             window.rootViewController = TabBarController(coreDataStack: coreDataStack)
         } else {
             let pageViewController = PageViewController()
