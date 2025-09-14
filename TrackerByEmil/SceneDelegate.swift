@@ -10,7 +10,7 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-    let coreDataStack = CoreDataStack()  // один общий стек
+    let coreDataStack = CoreDataStack()  
     
     func scene(_ scene: UIScene,
                willConnectTo session: UISceneSession,

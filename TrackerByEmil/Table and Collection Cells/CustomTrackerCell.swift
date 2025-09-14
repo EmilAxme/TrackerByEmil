@@ -185,7 +185,7 @@ final class CustomTrackerCell: UICollectionViewCell {
         nameAndEmojiView.backgroundColor = source.color
         doneButton.backgroundColor = source.color
 
-        isTrackerDone = isCompleted   // <-- вот это важно
+        isTrackerDone = isCompleted  
         updateCompletionState(isCompleted: isCompleted)
         daysCountLabel.text = "\(dayCount) \(dayWord(for: dayCount))"
     }
@@ -205,7 +205,6 @@ final class CustomTrackerCell: UICollectionViewCell {
 
     @objc private func doneButtonTapped() {
         guard let trackerId = trackerId else { return }
-        // используем локальное состояние, а не systemName
         let newIsCompleted = !isTrackerDone
         isTrackerDone = newIsCompleted
         onDoneButtonTapped?(trackerId, newIsCompleted)

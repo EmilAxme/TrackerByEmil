@@ -376,7 +376,6 @@ final class TrackerViewController: UIViewController {
             return
         }
         
-        // Преобразуем данные из Core Data в формат TrackerCategory
         var loadedCategories: [TrackerCategory] = []
         
         for section in 0..<trackerProvider.numberOfSections {
@@ -447,7 +446,6 @@ extension TrackerViewController: UICollectionViewDataSource {
                 }
             }
 
-            // пересчитываем количество дней
             let daysCount = self.completedTrackers.filter { $0.id == trackerId }.count
             cell.configure(source: tracker, isCompleted: isCompleted, dayCount: daysCount)
         }
