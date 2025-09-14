@@ -146,17 +146,22 @@ final class TrackerViewController: UIViewController {
         super.viewDidLoad()
 
         setupDependenciesIfNeeded()
-        
+
         trackerCollection.dataSource = self
         trackerCollection.delegate = self
         trackerCollection.register(CustomTrackerCell.self, forCellWithReuseIdentifier: CustomTrackerCell.reuseIdentifier)
-        trackerCollection.register(HeaderOfTrackersSection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderOfTrackersSection.reuseIdentifier)
-        
+        trackerCollection.register(HeaderOfTrackersSection.self,
+                                   forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                   withReuseIdentifier: HeaderOfTrackersSection.reuseIdentifier)
+
         setupUI()
+
+        // Загружаем категории и записи
         loadTrackersFromCoreData()
-        
         loadCompletedTrackers()
-        trackerCollection.reloadData()
+
+        // Обновляем видимые категории и только потом перерисовываем
+        updateVisibleCategories()
     }
     
     // MARK: - Private Methods
@@ -284,20 +289,16 @@ final class TrackerViewController: UIViewController {
         let filteredWeekDay = calendar.component(.weekday, from: datePicker.date)
         
         visibleCategories = categories.compactMap { category in
-            let trackers = category.trackerOfCategory.filter { tracker in
-                tracker.schedule.contains { weekDay in
-                    weekDay.rawValue == filteredWeekDay
-                } == true
+            // Фильтруем только трекеры по выбранному дню недели
+            let trackersForDay = category.trackerOfCategory.filter { tracker in
+                tracker.schedule.contains { $0.rawValue == filteredWeekDay }
             }
-            if trackers.isEmpty {
-                return nil
-            }
+            if trackersForDay.isEmpty { return nil }
             
-            return TrackerCategory(
-                title: category.title,
-                trackerOfCategory: trackers
-            )
+            // Используем существующий title категории
+            return TrackerCategory(title: category.title, trackerOfCategory: trackersForDay)
         }
+        
         updateStubVisibility()
         updateDateField()
         trackerCollection.reloadData()
@@ -378,41 +379,25 @@ final class TrackerViewController: UIViewController {
             print("Ошибка при сохранении трекера: \(error)")
         }
     }
+    
     func loadTrackersFromCoreData() {
-        guard let trackerProvider = trackerProvider else {
-            print("TrackerProvider не инициализирован")
-            return
-        }
-        
-        var loadedCategories: [TrackerCategory] = []
-        
+        guard let trackerProvider = trackerProvider else { return }
+
+        var categoriesDict: [String: [Tracker]] = [:]
+
         for section in 0..<trackerProvider.numberOfSections {
-            var trackers: [Tracker] = []
-            
             for row in 0..<trackerProvider.numberOfRowsInSection(section) {
                 let indexPath = IndexPath(row: row, section: section)
-                if let trackerCD = trackerProvider.object(at: indexPath) {
-                    if let tracker = convertToTracker(trackerCD: trackerCD) {
-                        trackers.append(tracker)
-                    }
+                if let trackerCD = trackerProvider.object(at: indexPath),
+                   let tracker = convertToTracker(trackerCD: trackerCD),
+                   let categoryTitle = trackerCD.category?.title {
+                    
+                    categoriesDict[categoryTitle, default: []].append(tracker)
                 }
             }
-            
-            if let firstTrackerCD = trackerProvider.object(at: IndexPath(row: 0, section: section)),
-               let categoryTitle = firstTrackerCD.category?.title, !trackers.isEmpty {
-                let category = TrackerCategory(title: categoryTitle, trackerOfCategory: trackers)
-                loadedCategories.append(category)
-            }
         }
-        
-        // Сохраняем категории
-        categories = loadedCategories
-        
-        // ✅ Сначала подтягиваем completedTrackers
-        loadCompletedTrackers()
-        
-        // Потом обновляем видимые категории и коллекцию
-        updateVisibleCategories()
+
+        categories = categoriesDict.map { TrackerCategory(title: $0.key, trackerOfCategory: $0.value) }
     }
 }
 

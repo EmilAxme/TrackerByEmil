@@ -185,8 +185,10 @@ final class CustomTrackerCell: UICollectionViewCell {
         nameAndEmojiView.backgroundColor = source.color
         doneButton.backgroundColor = source.color
 
-        isTrackerDone = isCompleted  
+        isTrackerDone = isCompleted
         updateCompletionState(isCompleted: isCompleted)
+
+        // обновляем сразу, без async
         daysCountLabel.text = "\(dayCount) \(dayWord(for: dayCount))"
     }
     
