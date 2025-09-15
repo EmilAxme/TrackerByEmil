@@ -157,25 +157,10 @@ final class CustomTrackerCell: UICollectionViewCell {
     private func updateDaysCountLabel() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.daysCountLabel.text = "\(self.dayCount) \(self.dayWord(for: self.dayCount))"
+            self.daysCountLabel.text = "days_count".localizedPlural(dayCount)
         }
     }
-
-    private func dayWord(for number: Int) -> String {
-        let lastTwoDigits = number % 100
-        let lastDigit = number % 10
-
-        if (11...14).contains(lastTwoDigits) {
-            return "дней"
-        }
-
-        switch lastDigit {
-        case 1: return "день"
-        case 2, 3, 4: return "дня"
-        default: return "дней"
-        }
-    }
-
+    
     // MARK: - Public Methods
 
     func configure(source: Tracker, isCompleted: Bool, dayCount: Int) {
@@ -190,7 +175,7 @@ final class CustomTrackerCell: UICollectionViewCell {
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.daysCountLabel.text = "\(dayCount) \(dayWord(for: dayCount))"
+            self.daysCountLabel.text = "days_count".localizedPlural(dayCount)
         }
     }
     
