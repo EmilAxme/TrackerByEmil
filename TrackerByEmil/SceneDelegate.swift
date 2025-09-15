@@ -10,20 +10,33 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-    let coreDataStack = CoreDataStack()
+    let coreDataStack = CoreDataStack()  
     
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    func scene(_ scene: UIScene,
+               willConnectTo session: UISceneSession,
+               options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        
-        let trackerStore = TrackerStore(context: coreDataStack.context)
-        let trackerCategoryStore = TrackerCategoryStore(context: coreDataStack.context)
-        let trackerRecordStore = TrackerRecordStore(context: coreDataStack.context)
-        
-        let tabBarController = TabBarController()
-       
-        window.rootViewController = tabBarController
-        
+
+        if AppSettings.hasSeenOnboarding {
+            window.rootViewController = TabBarController(coreDataStack: coreDataStack)
+        } else {
+            let pageViewController = PageViewController()
+            pageViewController.onFinish = { [weak self] in
+                guard let self = self else { return }
+                AppSettings.hasSeenOnboarding = true
+                let tabBarController = TabBarController(coreDataStack: self.coreDataStack)
+                
+                UIView.transition(with: self.window!,
+                                  duration: 0.3,
+                                  options: .transitionCrossDissolve,
+                                  animations: {
+                    self.window?.rootViewController = tabBarController
+                })
+            }
+            window.rootViewController = pageViewController
+        }
+
         self.window = window
         window.makeKeyAndVisible()
     }

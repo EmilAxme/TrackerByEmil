@@ -54,6 +54,7 @@ final class CreateTrackerViewController: UIViewController {
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
     var selectedScheduleDays: [WeekDay] = []
+    var selectedCategory = ""
     
     private var isFormValid: Bool = false
     var delegate: TrackerViewController?
@@ -250,15 +251,18 @@ final class CreateTrackerViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func cancelButtonTapped() {
+        delegate?.loadTrackersFromCoreData()
         dismiss(animated: true)
     }
     
     @objc private func createButtonTapped() {
         guard let tracker = createTracker() else { return }
+        let categoryName = selectedCategory
+        delegate?.loadTrackersFromCoreData()
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.delegate?.addNewTracker(tracker, to: "Важное")
+            self.delegate?.addNewTracker(tracker, to: categoryName)
             self.dismiss(animated: true)
         }
     }
@@ -283,8 +287,9 @@ final class CreateTrackerViewController: UIViewController {
         let isEmojiSelected = selectedEmoji != nil
         let isColorSelected = selectedColor != nil
         let isScheduleSelected = !selectedScheduleDays.isEmpty
+        let trackerCategorySelected = !selectedCategory.isEmpty
         
-        let isFormNowValid = isNameEntered && isEmojiSelected && isColorSelected && isScheduleSelected
+        let isFormNowValid = isNameEntered && isEmojiSelected && isColorSelected && isScheduleSelected && trackerCategorySelected
         
         if isFormNowValid != isFormValid {
             isFormValid = isFormNowValid
@@ -342,7 +347,7 @@ extension CreateTrackerViewController: UITableViewDataSource {
                     return UITableViewCell()
                 }
                 cell.titleLabel.text = "Категория"
-                cell.descriptionLabel.text = "Важное"
+                cell.descriptionLabel.text = selectedCategory.isEmpty ? "Выберите или создайте :)" : selectedCategory
                 return cell
             } else {
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleCell.reusableIdentifier, for: indexPath) as? ScheduleCell else {
@@ -358,7 +363,7 @@ extension CreateTrackerViewController: UITableViewDataSource {
             }
             if indexPath.row == 0 {
                 cell.titleLabel.text = "Категория"
-                cell.descriptionLabel.text = "Важное"
+                cell.descriptionLabel.text = selectedCategory.isEmpty ? "Выберите или создайте :)" : selectedCategory
                 return cell
             } else {
                 cell.titleLabel.text = "Расписание"
@@ -386,12 +391,29 @@ extension CreateTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if indexPath.row == 0 {
-            // Обработка выбора категории
+            guard let coreDataStack = (delegate)?.coreDataStack else { return }
+            let store = TrackerCategoryStore(context: coreDataStack.context)
+            let vm = CategorySelectViewModel(store: store)
+            let categorySelectViewController = CategorySelectViewController(viewModel: vm)
+            categorySelectViewController.delegate = self
+            present(UINavigationController(rootViewController: categorySelectViewController), animated: true)
         } else {
             let scheduleSelectViewController = ScheduleSelectViewController()
             scheduleSelectViewController.delegate = self
             scheduleSelectViewController.selectedDays = Set(selectedScheduleDays)
-            navigationController?.pushViewController(scheduleSelectViewController, animated: true)
+            present(UINavigationController(rootViewController: scheduleSelectViewController), animated: true)
+        }
+    }
+}
+
+// MARK: - CategorySelectViewControllerDelegate
+
+extension CreateTrackerViewController: CategorySelectViewControllerDelegate {
+    func didSelectCategory(_ category: TrackerCategoryCD) {
+        self.selectedCategory = category.title ?? ""  
+        DispatchQueue.main.async {
+            self.categoryAndScheduleTableView.reloadData()
+            self.updateCreateButtonStateIfNeeded()
         }
     }
 }

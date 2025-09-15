@@ -22,6 +22,9 @@ protocol TrackerRecordProviderProtocol {
     func object(at indexPath: IndexPath) -> TrackerRecordCD?
     func addRecord(_ record: TrackerRecord) throws
     func deleteRecord(at indexPath: IndexPath) throws
+
+    func removeRecord(_ record: TrackerRecord) throws   // ✅ новый
+    func fetchAllRecords() -> [TrackerRecord]           // ✅ новый
 }
 
 final class TrackerRecordProvider: NSObject {
@@ -77,6 +80,33 @@ extension TrackerRecordProvider: TrackerRecordProviderProtocol {
         let record = fetchedResultsController.object(at: indexPath)
         coreDataStack.context.delete(record)
         try coreDataStack.context.save()
+    }
+    
+    func removeRecord(_ record: TrackerRecord) throws {
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: record.date)
+        guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return }
+
+        let request: NSFetchRequest<TrackerRecordCD> = TrackerRecordCD.fetchRequest()
+        request.predicate = NSPredicate(
+            format: "id == %@ AND (date >= %@) AND (date < %@)",
+            record.id as CVarArg,
+            startOfDay as CVarArg,
+            endOfDay as CVarArg
+        )
+
+        if let existing = try coreDataStack.context.fetch(request).first {
+            coreDataStack.context.delete(existing)
+            try coreDataStack.context.save()
+        }
+    }
+
+    func fetchAllRecords() -> [TrackerRecord] {
+        let recordsCD = fetchedResultsController.fetchedObjects ?? []
+        return recordsCD.compactMap { recordCD in
+            guard let id = recordCD.id, let date = recordCD.date else { return nil }
+            return TrackerRecord(id: id, date: date)
+        }
     }
 }
 

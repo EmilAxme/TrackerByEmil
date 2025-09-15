@@ -13,32 +13,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-//        guard let windowScene = (scene as? UIWindowScene) else { return }
-//        
-//        let window = UIWindow(windowScene: windowScene)
-//        
-//        let tabBarController = TabBarController()
-//        
-//        window.rootViewController = tabBarController
-//        
-//        // Настроим окно
-//        self.window = window
-//        window.makeKeyAndVisible()
+        
     }
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Создаем CoreDataStack
-        let coreDataStack = CoreDataStack()
-        
-        // Создаем TabBarController с инъекцией зависимостей
-        let tabBarController = TabBarController(coreDataStack: coreDataStack)
-        
-        // Настраиваем window
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = tabBarController
-        window?.makeKeyAndVisible()
         
+        window?.makeKeyAndVisible()
         return true
     }
 

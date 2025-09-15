@@ -2,8 +2,6 @@
 //  TrackerCategoryProvider.swift
 //  TrackerByEmil
 //
-//  Created by Emil on 24.08.2025.
-//
 
 import CoreData
 
@@ -20,12 +18,10 @@ protocol TrackerCategoryProviderProtocol {
     var numberOfSections: Int { get }
     func numberOfRowsInSection(_ section: Int) -> Int
     func object(at indexPath: IndexPath) -> TrackerCategoryCD?
-    func addCategory(_ category: TrackerCategory) throws
-    func deleteCategory(at indexPath: IndexPath) throws
 }
 
 final class TrackerCategoryProvider: NSObject {
-    private let coreDataStack: CoreDataStackProtocol
+    private let store: TrackerCategoryStoreProtocol
     weak var delegate: TrackerCategoryProviderDelegate?
     
     private var insertedIndexes: IndexSet?
@@ -37,7 +33,7 @@ final class TrackerCategoryProvider: NSObject {
         
         let frc = NSFetchedResultsController(
             fetchRequest: request,
-            managedObjectContext: coreDataStack.context,
+            managedObjectContext: (store as! TrackerCategoryStore).context, // достаем context
             sectionNameKeyPath: nil,
             cacheName: nil
         )
@@ -46,8 +42,8 @@ final class TrackerCategoryProvider: NSObject {
         return frc
     }()
     
-    init(coreDataStack: CoreDataStackProtocol, delegate: TrackerCategoryProviderDelegate? = nil) {
-        self.coreDataStack = coreDataStack
+    init(store: TrackerCategoryStoreProtocol, delegate: TrackerCategoryProviderDelegate? = nil) {
+        self.store = store
         self.delegate = delegate
         super.init()
     }
@@ -64,30 +60,6 @@ extension TrackerCategoryProvider: TrackerCategoryProviderProtocol {
     
     func object(at indexPath: IndexPath) -> TrackerCategoryCD? {
         fetchedResultsController.object(at: indexPath)
-    }
-    
-    func addCategory(_ category: TrackerCategory) throws {
-        let categoryCD = TrackerCategoryCD(context: coreDataStack.context)
-        categoryCD.title = category.title
-        
-        for tracker in category.trackerOfCategory {
-            let trackerCD = TrackerCD(context: coreDataStack.context)
-            trackerCD.id = tracker.id
-            trackerCD.name = tracker.name
-            trackerCD.emoji = tracker.emoji
-            trackerCD.color = UIColorMarshalling.hexString(from: tracker.color)
-            trackerCD.schedule = tracker.schedule.toData()
-            
-            trackerCD.category = categoryCD // связь
-        }
-        
-        try coreDataStack.context.save()
-    }
-    
-    func deleteCategory(at indexPath: IndexPath) throws {
-        let category = fetchedResultsController.object(at: indexPath)
-        coreDataStack.context.delete(category)
-        try coreDataStack.context.save()
     }
 }
 
@@ -123,7 +95,7 @@ extension TrackerCategoryProvider: NSFetchedResultsControllerDelegate {
                 deletedIndexes?.insert(indexPath.item)
             }
         default:
-            print("Неверно выбран тип изменения")
+            break
         }
     }
 }

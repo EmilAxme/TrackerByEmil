@@ -146,24 +146,31 @@ final class TrackerViewController: UIViewController {
         super.viewDidLoad()
 
         setupDependenciesIfNeeded()
-        
+
         trackerCollection.dataSource = self
         trackerCollection.delegate = self
         trackerCollection.register(CustomTrackerCell.self, forCellWithReuseIdentifier: CustomTrackerCell.reuseIdentifier)
-        trackerCollection.register(HeaderOfTrackersSection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderOfTrackersSection.reuseIdentifier)
-        
+        trackerCollection.register(HeaderOfTrackersSection.self,
+                                   forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                   withReuseIdentifier: HeaderOfTrackersSection.reuseIdentifier)
+
         setupUI()
+
         loadTrackersFromCoreData()
+        loadCompletedTrackers()
+
+        updateVisibleCategories()
     }
     
     // MARK: - Private Methods
     
     private func setupDependenciesIfNeeded() {
         let coreDataStack = self.coreDataStack ?? CoreDataStack()
+        let categoryStore = TrackerCategoryStore(context: coreDataStack.context)
         self.coreDataStack = coreDataStack
         
         trackerProvider = trackerProvider ?? TrackerProvider(coreDataStack: coreDataStack)
-        trackerCategoryProvider = trackerCategoryProvider ?? TrackerCategoryProvider(coreDataStack: coreDataStack)
+        trackerCategoryProvider = trackerCategoryProvider ?? TrackerCategoryProvider(store: categoryStore)
         trackerRecordProvider = trackerRecordProvider ?? TrackerRecordProvider(coreDataStack: coreDataStack)
         
         (trackerProvider as? TrackerProvider)?.delegate = self
@@ -222,39 +229,7 @@ final class TrackerViewController: UIViewController {
         ])
     }
     
-    private func loadTrackersFromCoreData() {
-        guard let trackerProvider = trackerProvider else {
-            print("TrackerProvider не инициализирован")
-            return
-        }
-        
-        // Преобразуем данные из Core Data в формат TrackerCategory
-        var loadedCategories: [TrackerCategory] = []
-        
-        for section in 0..<trackerProvider.numberOfSections {
-            var trackers: [Tracker] = []
-            
-            for row in 0..<trackerProvider.numberOfRowsInSection(section) {
-                let indexPath = IndexPath(row: row, section: section)
-                if let trackerCD = trackerProvider.object(at: indexPath) {
-                    if let tracker = convertToTracker(trackerCD: trackerCD) {
-                        trackers.append(tracker)
-                    }
-                }
-            }
-            
-            if let firstTrackerCD = trackerProvider.object(at: IndexPath(row: 0, section: section)),
-               let categoryTitle = firstTrackerCD.category?.title, !trackers.isEmpty {
-                let category = TrackerCategory(title: categoryTitle, trackerOfCategory: trackers)
-                loadedCategories.append(category)
-            }
-        }
-        
-        categories = loadedCategories
-        updateVisibleCategories()
-        
-        trackerCollection.reloadData()
-    }
+
     
     private func convertToTracker(trackerCD: TrackerCD) -> Tracker? {
         guard let id = trackerCD.id,
@@ -312,20 +287,16 @@ final class TrackerViewController: UIViewController {
         let filteredWeekDay = calendar.component(.weekday, from: datePicker.date)
         
         visibleCategories = categories.compactMap { category in
-            let trackers = category.trackerOfCategory.filter { tracker in
-                tracker.schedule.contains { weekDay in
-                    weekDay.rawValue == filteredWeekDay
-                } == true
+            // Фильтруем только трекеры по выбранному дню недели
+            let trackersForDay = category.trackerOfCategory.filter { tracker in
+                tracker.schedule.contains { $0.rawValue == filteredWeekDay }
             }
-            if trackers.isEmpty {
-                return nil
-            }
+            if trackersForDay.isEmpty { return nil }
             
-            return TrackerCategory(
-                title: category.title,
-                trackerOfCategory: trackers
-            )
+            // Используем существующий title категории
+            return TrackerCategory(title: category.title, trackerOfCategory: trackersForDay)
         }
+        
         updateStubVisibility()
         updateDateField()
         trackerCollection.reloadData()
@@ -366,10 +337,16 @@ final class TrackerViewController: UIViewController {
             return existing
         } else {
             let newCategory = TrackerCategory(title: title, trackerOfCategory: [])
-            try trackerCategoryProvider?.addCategory(newCategory)
+            let store = TrackerCategoryStore(context: coreDataStack.context)
+            try store.addCategory(newCategory)
             return try coreDataStack.context.fetch(request).first
                 ?? { throw NSError(domain: "TrackerError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Не удалось создать категорию"]) }()
         }
+    }
+    
+    private func loadCompletedTrackers() {
+        guard let trackerRecordProvider else { return }
+        completedTrackers = trackerRecordProvider.fetchAllRecords()
     }
     
     // MARK: - Actions
@@ -385,7 +362,7 @@ final class TrackerViewController: UIViewController {
     // MARK: - Public Methods
     
     func addNewTracker(_ tracker: Tracker, to categoryTitle: String) {
-        guard let trackerProvider, let trackerCategoryProvider else {
+        guard let trackerProvider else {
             assertionFailure("Dependencies are not initialized")
             return
         }
@@ -393,12 +370,34 @@ final class TrackerViewController: UIViewController {
         do {
             let category = try fetchOrCreateCategory(title: categoryTitle)
             try trackerProvider.addTracker(tracker, to: category)
-            
+        
             updateLocalCategories(with: tracker, categoryTitle: categoryTitle)
+            
+            updateVisibleCategories()
             
         } catch {
             print("Ошибка при сохранении трекера: \(error)")
         }
+    }
+    
+    func loadTrackersFromCoreData() {
+        guard let trackerProvider = trackerProvider else { return }
+
+        var categoriesDict: [String: [Tracker]] = [:]
+
+        for section in 0..<trackerProvider.numberOfSections {
+            for row in 0..<trackerProvider.numberOfRowsInSection(section) {
+                let indexPath = IndexPath(row: row, section: section)
+                if let trackerCD = trackerProvider.object(at: indexPath),
+                   let tracker = convertToTracker(trackerCD: trackerCD),
+                   let categoryTitle = trackerCD.category?.title {
+                    
+                    categoriesDict[categoryTitle, default: []].append(tracker)
+                }
+            }
+        }
+
+        categories = categoriesDict.map { TrackerCategory(title: $0.key, trackerOfCategory: $0.value) }
     }
 }
 
@@ -418,25 +417,36 @@ extension TrackerViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        let category = visibleCategories[indexPath.section].trackerOfCategory[indexPath.row]
+
         
         let isFutureDate = datePicker.date > Date()
         
-        cell.configure(source: category)
-        cell.isFuture(isActive: !isFutureDate)
-        
-        cell.onDoneButtonTapped = { [weak self] trackerId, isCompleted in
-            guard let self = self else { return }
+        let tracker = visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
 
+        let isCompletedToday = completedTrackers.contains {
+            $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
+        }
+        let daysCount = completedTrackers.filter { $0.id == tracker.id }.count
+        
+        print("Первый", daysCount)
+        
+        cell.configure(source: tracker, isCompleted: isCompletedToday, dayCount: daysCount)
+        cell.isFuture(isActive: !isFutureDate)
+
+        cell.onDoneButtonTapped = { [weak self] trackerId, isCompleted in
+            guard let self else { return }
             let record = TrackerRecord(id: trackerId, date: self.currentDate)
 
-            if isCompleted {
-                self.completedTrackers.append(record)
-            } else {
-                self.completedTrackers.removeAll { $0.id == trackerId && Calendar.current.isDate($0.date, inSameDayAs: self.currentDate) }
+            do {
+                if isCompleted {
+                    try self.trackerRecordProvider?.addRecord(record)
+                } else {
+                    try self.trackerRecordProvider?.removeRecord(record)
+                }
+            } catch {
+                print("Ошибка при изменении записи: \(error)")
             }
         }
-        
         return cell
     }
     
@@ -519,7 +529,10 @@ extension TrackerViewController: TrackerCategoryProviderDelegate {
 extension TrackerViewController: TrackerRecordProviderDelegate {
     func didUpdate(_ update: TrackerRecordStoreUpdate) {
         DispatchQueue.main.async { [weak self] in
-            self?.loadTrackersFromCoreData()
+            guard let self else { return }
+            // Подтягиваем актуальные записи
+            self.completedTrackers = self.trackerRecordProvider?.fetchAllRecords() ?? []
+            self.trackerCollection.reloadData()
         }
     }
 }
