@@ -9,7 +9,6 @@ final class CategorySelectViewController: UIViewController {
     weak var delegate: CategorySelectViewControllerDelegate?
     
     // MARK: - Layout Constants
-    
     private enum Constants {
         // Layout
         static let cornerRadius: CGFloat = 16
@@ -23,21 +22,27 @@ final class CategorySelectViewController: UIViewController {
         static let stubSpacing: CGFloat = 8
         static let stubImageSize: CGFloat = 80
         static let stubStackHeight: CGFloat = 106
-        
+
         // Titles
-        static let screenTitle = "Категории"
-        static let addCategoryTitle = "Добавить категорию"
-        static let doneTitle = "Готово"
+        static let screenTitle = "category_screen_title".localized
+        static let addCategoryTitle = "add_category_title".localized
+        static let doneTitle = "done_title".localized
         
         // Alert
-        static let alertDeleteTitle = "Удаление категории"
-        static let alertDeleteMessage = "Эта категория точно не нужна?"
-        static let alertDeleteAction = "Удалить"
-        static let alertCancelAction = "Отменить"
+        static let alertDeleteTitle = "alert_delete_title".localized
+        static let alertDeleteMessage = "alert_delete_message".localized
+        static let alertDeleteAction = "alert_delete_action".localized
+        static let alertCancelAction = "alert_cancel_action".localized
         
         // Errors
-        static let errorTitle = "Ошибка"
-        static let errorOkAction = "Ок"
+        static let errorTitle = "error_title".localized
+        static let errorOkAction = "error_ok_action".localized
+        
+        // Stub
+        static let stubText = "stub_text".localized
+        
+        // Context menu
+        static let editActionTitle = "edit_action_title".localized
     }
     
     // MARK: - Properties
@@ -78,19 +83,19 @@ final class CategorySelectViewController: UIViewController {
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         return button
     }()
+
+    private lazy var stubLabel: UILabel = {
+        let label = UILabel()
+        label.text = Constants.stubText
+        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.textColor = .label
+        return label
+    }()
     
     private lazy var stubImage: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(resource: .stub)
         return imageView
-    }()
-    
-    private lazy var stubLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Привычки и события можно объединить по смыслу?"
-        label.font = .systemFont(ofSize: 12, weight: .medium)
-        label.textColor = .label
-        return label
     }()
     
     private lazy var stubStackView: UIStackView = {
@@ -260,7 +265,7 @@ extension CategorySelectViewController: UITableViewDelegate {
         ) { [weak self] _ in
             guard let self = self else { return nil }
 
-            let edit = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
+            let edit = UIAction(title: Constants.editActionTitle, image: UIImage(systemName: "pencil")) { _ in
                 let category = self.viewModel.categories[indexPath.row]
                 let editVC = EditCategoryViewController()
                 editVC.category = category
