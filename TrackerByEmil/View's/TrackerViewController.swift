@@ -13,6 +13,8 @@ final class TrackerViewController: UIViewController {
     // MARK: - Layout Constants
     
     private enum Constants {
+        
+        //Layout
         static let cornerRadius: CGFloat = 8
         static let smallCornerRadius: CGFloat = 10
         static let dateFieldWidth: CGFloat = 77
@@ -33,6 +35,11 @@ final class TrackerViewController: UIViewController {
         static let sectionSpacing: CGFloat = 9
         static let horizontalInset: CGFloat = 16
         static let itemsInRow: CGFloat = 2
+        
+        // Localize
+        static let screenTitle = "trackers_title".localized
+        static let searchPlaceholder = "search_placeholder".localized
+        static let stubText = "stub_text".localized
     }
     
     // MARK: - Properties
@@ -95,7 +102,7 @@ final class TrackerViewController: UIViewController {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Трекеры"
+        label.text = Constants.screenTitle
         label.textColor = .label
         label.font = .systemFont(ofSize: 34, weight: .bold)
         return label
@@ -103,7 +110,7 @@ final class TrackerViewController: UIViewController {
     
     private lazy var trackerSearchBar: UISearchBar = {
         let searchBar = UISearchBar()
-        searchBar.placeholder = "Поиск"
+        searchBar.placeholder = Constants.searchPlaceholder
         searchBar.backgroundImage = UIImage()
         searchBar.searchTextField.layer.cornerRadius = Constants.smallCornerRadius
         searchBar.searchTextField.layer.masksToBounds = true
@@ -126,7 +133,7 @@ final class TrackerViewController: UIViewController {
     
     private lazy var stubLabel: UILabel = {
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
+        label.text = Constants.stubText
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = .label
         return label
@@ -427,8 +434,6 @@ extension TrackerViewController: UICollectionViewDataSource {
             $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
         }
         let daysCount = completedTrackers.filter { $0.id == tracker.id }.count
-        
-        print("Первый", daysCount)
         
         cell.configure(source: tracker, isCompleted: isCompletedToday, dayCount: daysCount)
         cell.isFuture(isActive: !isFutureDate)
