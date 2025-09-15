@@ -16,7 +16,13 @@ class PageViewController: UIPageViewController {
         static let buttonSpacing: CGFloat = 16
         static let buttonBottomInset: CGFloat = 50
         static let pageControlSpacing: CGFloat = 24
+
+        // MARK: - Strings
+        static let jumpButtonTitle = "jump_button_title".localized
+        static let onboardingPage1Text = "onboarding_page1_text".localized
+        static let onboardingPage2Text = "onboarding_page2_text".localized
     }
+    
     // MARK: - Closure
     var onFinish: (() -> Void)?
     
@@ -24,20 +30,20 @@ class PageViewController: UIPageViewController {
     private lazy var jumpButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = .ypBlack
-        button.setTitle("Вот это технологии!", for: .normal)
+        button.setTitle(Constants.jumpButtonTitle, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.addTarget(self, action: #selector(handleJump), for: .touchUpInside)
         button.layer.cornerRadius = Constants.buttonCornerRadius
         return button
     }()
-    
+
     private lazy var pages: [UIViewController] = {
         return [
             OnboardingPageViewController(pageModel: OnboardingPageModel(
-                image: UIImage(resource: .onboarding1), text: "Отслеживайте только то, что хотите"
+                image: UIImage(resource: .onboarding1), text: Constants.onboardingPage1Text
             )),
             OnboardingPageViewController(pageModel: OnboardingPageModel(
-                image: UIImage(resource: .onboarding2), text: "Даже если это не литры воды и йога"
+                image: UIImage(resource: .onboarding2), text: Constants.onboardingPage2Text
             ))
         ]
     }()
