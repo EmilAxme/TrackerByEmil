@@ -11,10 +11,16 @@ final class AddTrackerViewController: UIViewController {
     
     // MARK: - Layout Constants
     
-    private enum Layout {
+    private enum Constants {
+        // UI
         static let buttonHeight: CGFloat = 60
         static let horizontalInset: CGFloat = 20
         static let stackSpacing: CGFloat = 16
+        
+        // Localized strings
+        static let habitButtonTitle = "habit_button_title".localized
+        static let irregularEventButtonTitle = "irregular_event_button_title".localized
+        static let screenTitle = "add_tracker_screen_title".localized
     }
     
     // MARK: - Properties
@@ -26,7 +32,7 @@ final class AddTrackerViewController: UIViewController {
     private lazy var addHabitButton: UIButton = {
         let button = UIButton(type: .custom)
         button.backgroundColor = UIColor(named: "Black")
-        button.setTitle("Привычка", for: .normal)
+        button.setTitle(Constants.habitButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = UIColor(named: "White")
         button.layer.cornerRadius = 16
@@ -38,7 +44,7 @@ final class AddTrackerViewController: UIViewController {
     private lazy var addIrregularEventButton: UIButton = {
         let button = UIButton(type: .custom)
         button.backgroundColor = UIColor(named: "Black")
-        button.setTitle("Нерегулярное событие", for: .normal)
+        button.setTitle(Constants.irregularEventButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = UIColor(named: "White")
         button.layer.cornerRadius = 16
@@ -51,7 +57,7 @@ final class AddTrackerViewController: UIViewController {
         let stackView = UIStackView(arrangedSubviews: [addHabitButton, addIrregularEventButton])
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
-        stackView.spacing = Layout.stackSpacing
+        stackView.spacing = Constants.stackSpacing
         return stackView
     }()
     
@@ -70,11 +76,11 @@ final class AddTrackerViewController: UIViewController {
         view.addToView(buttonsStackView)
         
         NSLayoutConstraint.activate([
-            addHabitButton.heightAnchor.constraint(equalToConstant: Layout.buttonHeight),
-            addIrregularEventButton.heightAnchor.constraint(equalToConstant: Layout.buttonHeight),
+            addHabitButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight),
+            addIrregularEventButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight),
             
-            buttonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Layout.horizontalInset),
-            buttonsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Layout.horizontalInset),
+            buttonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.horizontalInset),
+            buttonsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.horizontalInset),
             buttonsStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
     }
@@ -84,7 +90,7 @@ final class AddTrackerViewController: UIViewController {
     }
     
     private func setupNavigation() {
-        title = "Создание трекера"
+        title = Constants.screenTitle
     }
     
     // MARK: - Actions
