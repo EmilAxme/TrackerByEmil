@@ -1,0 +1,62 @@
+/* 
+  Localizable.strings
+  TrackerByEmil
+
+  Created by Emil on 15.09.2025.
+  
+*/
+
+"jump_button_title" = "That's technology!";
+"onboarding_page1_text" = "Track only what you want";
+"onboarding_page2_text" = "Even if it's not liters of water and yoga";
+
+"category_screen_title" = "Categories";
+"add_category_title" = "Add category";
+"done_title" = "Done";
+
+"alert_delete_title" = "Delete category";
+"alert_delete_message" = "Are you sure you don’t need this category?";
+"alert_delete_action" = "Delete";
+"alert_cancel_action" = "Cancel";
+
+"error_title" = "Error";
+"error_ok_action" = "OK";
+
+"stub_text" = "Do you want to group habits and events by meaning?";
+"edit_action_title" = "Edit";
+
+"edit_category_placeholder" = "Category name";
+"done_title" = "Done";
+"edit_category_screen_title" = "Edit Category";
+"schedule_screen_title" = "Schedule";
+
+"habit_button_title" = "Habit";
+"irregular_event_button_title" = "Irregular Event";
+"add_tracker_screen_title" = "Add Tracker";
+
+"tracker_name_placeholder" = "Enter tracker name";
+"cancel_button_title" = "Cancel";
+"create_button_title" = "Create";
+"new_irregular_event_screen_title" = "New Irregular Event";
+"category_title" = "Category";
+"category_description" = "Important";
+"emoji_section_title" = "Emoji";
+"color_section_title" = "Color";
+
+"new_habit_title" = "New Habit";
+"tracker_name_placeholder" = "Enter tracker name";
+"cancel_button" = "Cancel";
+"create_button" = "Create";
+"category_title" = "Category";
+"schedule_title" = "Schedule";
+"every_day" = "Every day";
+"choose_or_create" = "Choose or create :)";
+"emoji_header" = "Emoji";
+"color_header" = "Color";
+"character_limit" = "Limit %d characters";
+
+"main_tab_title" = "Main";
+"statistic_tab_title" = "Statistics";
+
+"trackers_title" = "Trackers";
+"search_placeholder" = "Search";

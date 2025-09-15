@@ -1,0 +1,63 @@
+/* 
+  Localizable.strings
+  TrackerByEmil
+
+  Created by Emil on 15.09.2025.
+  
+*/
+
+"jump_button_title" = "Вот это технологии!";
+"onboarding_page1_text" = "Отслеживайте только то, что хотите";
+"onboarding_page2_text" = "Даже если это не литры воды и йога";
+
+"category_screen_title" = "Категории";
+"add_category_title" = "Добавить категорию";
+"done_title" = "Готово";
+
+"alert_delete_title" = "Удаление категории";
+"alert_delete_message" = "Эта категория точно не нужна?";
+"alert_delete_action" = "Удалить";
+"alert_cancel_action" = "Отменить";
+
+"error_title" = "Ошибка";
+"error_ok_action" = "Ок";
+
+"stub_text" = "Привычки и события можно объединить по смыслу?";
+"edit_action_title" = "Редактировать";
+
+"edit_category_placeholder" = "Название категории";
+"done_title" = "Готово";
+"edit_category_screen_title" = "Редактирование категории";
+"schedule_screen_title" = "Расписание";
+
+"habit_button_title" = "Привычка";
+"irregular_event_button_title" = "Нерегулярное событие";
+"add_tracker_screen_title" = "Создание трекера";
+
+"tracker_name_placeholder" = "Введите название трекера";
+"cancel_button_title" = "Отменить";
+"create_button_title" = "Создать";
+"new_irregular_event_screen_title" = "Новое нерегулярное событие";
+"category_title" = "Категория";
+"category_description" = "Важное";
+"emoji_section_title" = "Emoji";
+"color_section_title" = "Цвет";
+
+"new_habit_title" = "Новая привычка";
+"tracker_name_placeholder" = "Введите название трекера";
+"cancel_button" = "Отменить";
+"create_button" = "Создать";
+"category_title" = "Категория";
+"schedule_title" = "Расписание";
+"every_day" = "Каждый день";
+"choose_or_create" = "Выберите или создайте :)";
+"emoji_header" = "Emoji";
+"color_header" = "Цвет";
+"character_limit" = "Ограничение %d символов";
+
+"main_tab_title" = "Главный";
+"statistic_tab_title" = "Статистика";
+
+"trackers_title" = "Трекеры";
+"search_placeholder" = "Поиск";
+"stub_text" = "Что будем отслеживать?";
