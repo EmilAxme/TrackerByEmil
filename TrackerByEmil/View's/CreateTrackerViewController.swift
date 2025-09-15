@@ -5,6 +5,8 @@ final class CreateTrackerViewController: UIViewController {
     // MARK: - Layout Constants
     
     private enum Constants {
+        
+        // Layout
         static let cornerRadius: CGFloat = 16
         static let defaultSpacing: CGFloat = 24
         static let smallSpacing: CGFloat = 8
@@ -29,6 +31,22 @@ final class CreateTrackerViewController: UIViewController {
         static let emojiCornerRadius: CGFloat = 16
         static let maxCharacterCount: Int = 38
         static let animationDuration: TimeInterval = 0.3
+        
+        // Localized Strings  Добавил явные string в enum и локализовал их в CreateTrackerViewController
+        static let titleNewHabit = "new_habit_title".localized
+        static let placeholderName = "tracker_name_placeholder".localized
+        static let cancelButtonTitle = "cancel_button".localized
+        static let createButtonTitle = "create_button".localized
+        static let categoryTitle = "category_title".localized
+        static let scheduleTitle = "schedule_title".localized
+        static let everyDay = "every_day".localized
+        static let chooseOrCreate = "choose_or_create".localized
+        static let emojiHeader = "emoji_header".localized
+        static let colorHeader = "color_header".localized
+        
+        static func charLimit(_ limit: Int) -> String {
+            String(format: "character_limit".localized, limit)
+        }
     }
     
     // MARK: - Properties
@@ -68,7 +86,7 @@ final class CreateTrackerViewController: UIViewController {
     
     private lazy var characterCounterLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение \(Constants.maxCharacterCount) символов"
+        label.text = Constants.charLimit(Constants.maxCharacterCount)
         label.font = .systemFont(ofSize: 13)
         label.textColor = .ypGray
         label.textAlignment = .right
@@ -78,7 +96,7 @@ final class CreateTrackerViewController: UIViewController {
     
     private lazy var trackerNameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = Constants.placeholderName
         textField.backgroundColor = .ypBackground
         textField.layer.cornerRadius = Constants.cornerRadius
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: Constants.textFieldLeftPadding, height: textField.frame.height))
@@ -133,7 +151,7 @@ final class CreateTrackerViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(Constants.cancelButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .clear
         button.layer.borderWidth = 1
@@ -146,7 +164,7 @@ final class CreateTrackerViewController: UIViewController {
     
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(Constants.createButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .ypGray
         button.layer.cornerRadius = Constants.cornerRadius
@@ -180,7 +198,7 @@ final class CreateTrackerViewController: UIViewController {
     }
     
     private func setupNavigation() {
-        title = "Новая привычка"
+        title = Constants.titleNewHabit
         navigationItem.hidesBackButton = true
     }
     
@@ -346,14 +364,14 @@ extension CreateTrackerViewController: UITableViewDataSource {
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reusableIdentifier, for: indexPath) as? CategoryCell else {
                     return UITableViewCell()
                 }
-                cell.titleLabel.text = "Категория"
-                cell.descriptionLabel.text = selectedCategory.isEmpty ? "Выберите или создайте :)" : selectedCategory
+                cell.titleLabel.text = Constants.categoryTitle
+                cell.descriptionLabel.text = selectedCategory.isEmpty ? Constants.chooseOrCreate : selectedCategory
                 return cell
             } else {
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleCell.reusableIdentifier, for: indexPath) as? ScheduleCell else {
                     return UITableViewCell()
                 }
-                cell.titleLabel.text = "Расписание"
+                cell.titleLabel.text = Constants.scheduleTitle
                 cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
                 return cell
             }
@@ -362,13 +380,13 @@ extension CreateTrackerViewController: UITableViewDataSource {
                 return UITableViewCell()
             }
             if indexPath.row == 0 {
-                cell.titleLabel.text = "Категория"
-                cell.descriptionLabel.text = selectedCategory.isEmpty ? "Выберите или создайте :)" : selectedCategory
+                cell.titleLabel.text = Constants.categoryTitle
+                cell.descriptionLabel.text = selectedCategory.isEmpty ? Constants.chooseOrCreate : selectedCategory
                 return cell
             } else {
-                cell.titleLabel.text = "Расписание"
+                cell.titleLabel.text = Constants.scheduleTitle
                 if selectedScheduleDays.count == 7 {
-                    cell.descriptionLabel.text = "Каждый день"
+                    cell.descriptionLabel.text = Constants.everyDay
                 } else {
                     cell.descriptionLabel.text = selectedScheduleDays
                         .map { $0.shortName }
@@ -455,7 +473,7 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        header.categoryTitle.text = indexPath.section == 0 ? "Emoji" : "Цвет"
+        header.categoryTitle.text = indexPath.section == 0 ? Constants.emojiHeader : Constants.colorHeader
         return header
     }
 }
