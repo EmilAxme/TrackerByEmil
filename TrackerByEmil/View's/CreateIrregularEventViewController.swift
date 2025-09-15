@@ -12,6 +12,7 @@ final class CreateIrregularEventViewController: UIViewController {
     // MARK: - Layout Constants
     
     private enum Constants {
+        // Layout
         static let cornerRadius: CGFloat = 16
         static let defaultSpacing: CGFloat = 24
         static let mediumSpacing: CGFloat = 16
@@ -32,6 +33,16 @@ final class CreateIrregularEventViewController: UIViewController {
         static let colorBorderWidth: CGFloat = 3
         static let colorCornerRadius: CGFloat = 10
         static let animationDuration: TimeInterval = 0.3
+        
+        // Localized strings
+        static let textFieldPlaceholder = "tracker_name_placeholder".localized
+        static let cancelButtonTitle = "cancel_button_title".localized
+        static let createButtonTitle = "create_button_title".localized
+        static let screenTitle = "new_irregular_event_screen_title".localized
+        static let categoryTitle = "category_title".localized
+        static let categoryDescription = "category_description".localized
+        static let emojiSectionTitle = "emoji_section_title".localized
+        static let colorSectionTitle = "color_section_title".localized
     }
     
     // MARK: - Properties
@@ -68,7 +79,7 @@ final class CreateIrregularEventViewController: UIViewController {
     
     private lazy var trackerNameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = Constants.textFieldPlaceholder
         textField.backgroundColor = .ypBackground
         textField.layer.cornerRadius = Constants.cornerRadius
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: Constants.textFieldLeftPadding, height: textField.frame.height))
@@ -117,7 +128,7 @@ final class CreateIrregularEventViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(Constants.cancelButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .clear
         button.layer.borderWidth = 1
@@ -131,7 +142,7 @@ final class CreateIrregularEventViewController: UIViewController {
     
     private lazy var createButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(Constants.createButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .ypGray
         button.layer.cornerRadius = Constants.cornerRadius
@@ -205,7 +216,7 @@ final class CreateIrregularEventViewController: UIViewController {
     }
     
     private func setupNavigation() {
-        title = "Новое нерегулярное событие"
+        title = Constants.screenTitle
         navigationItem.hidesBackButton = true
     }
     
@@ -244,7 +255,7 @@ final class CreateIrregularEventViewController: UIViewController {
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.delegate?.addNewTracker(tracker, to: "Важное")
+            self.delegate?.addNewTracker(tracker, to: Constants.createButtonTitle)
             self.dismiss(animated: true)
         }
     }
@@ -289,8 +300,8 @@ extension CreateIrregularEventViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reusableIdentifier, for: indexPath) as? CategoryCell else {
             return UITableViewCell()
         }
-        cell.titleLabel.text = "Категория"
-        cell.descriptionLabel.text = "Важное"
+        cell.titleLabel.text = Constants.categoryTitle
+        cell.descriptionLabel.text = Constants.categoryDescription
         cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
         return cell
     }
@@ -338,7 +349,7 @@ extension CreateIrregularEventViewController: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        headerView.categoryTitle.text = indexPath.section == 0 ? "Emoji" : "Color"
+        headerView.categoryTitle.text = indexPath.section == 0 ? Constants.emojiSectionTitle : Constants.colorSectionTitle
         return headerView
     }
 }
