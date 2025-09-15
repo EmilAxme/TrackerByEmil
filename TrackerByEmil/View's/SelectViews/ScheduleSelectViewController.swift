@@ -10,7 +10,6 @@ import UIKit
 final class ScheduleSelectViewController: UIViewController {
     
     // MARK: - Layout Constants
-    
     private enum Constants {
         static let cornerRadius: CGFloat = 16
         static let defaultSpacing: CGFloat = 16
@@ -19,6 +18,10 @@ final class ScheduleSelectViewController: UIViewController {
         static let cellHeight: CGFloat = 75
         static let tableHeaderHeight: CGFloat = 1
         static let separatorInset: CGFloat = 16
+        
+        // Strings
+        static let readyButtonTitle = "done_title".localized
+        static let screenTitle = "schedule_screen_title".localized
     }
     
     // MARK: - Properties
@@ -53,7 +56,7 @@ final class ScheduleSelectViewController: UIViewController {
     private lazy var readyButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypBlack
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(Constants.readyButtonTitle, for: .normal)
         button.layer.masksToBounds = true
         button.layer.cornerRadius = Constants.cornerRadius
         button.addTarget(self, action: #selector(readyButtonTapped), for: .touchUpInside)
@@ -96,7 +99,7 @@ final class ScheduleSelectViewController: UIViewController {
     
     private func setupNavigation() {
         navigationItem.hidesBackButton = true
-        title = "Расписание"
+        title = Constants.screenTitle
     }
     
     // MARK: - Actions
