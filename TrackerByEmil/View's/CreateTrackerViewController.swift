@@ -32,7 +32,6 @@ final class CreateTrackerViewController: UIViewController {
         static let maxCharacterCount: Int = 38
         static let animationDuration: TimeInterval = 0.3
         
-        // Localized Strings  Добавил явные string в enum и локализовал их в CreateTrackerViewController
         static let titleNewHabit = "new_habit_title".localized
         static let placeholderName = "tracker_name_placeholder".localized
         static let cancelButtonTitle = "cancel_button".localized
@@ -318,16 +317,6 @@ final class CreateTrackerViewController: UIViewController {
             }
         }
     }
-    
-    func didChooseSchedule(_ days: [WeekDay]) {
-        selectedScheduleDays = days
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.categoryAndScheduleTableView.reloadData()
-
-        }
-        self.updateCreateButtonStateIfNeeded()
-    }
 }
 
 // MARK: - UITextFieldDelegate
@@ -424,17 +413,6 @@ extension CreateTrackerViewController: UITableViewDelegate {
     }
 }
 
-// MARK: - CategorySelectViewControllerDelegate
-
-extension CreateTrackerViewController: CategorySelectViewControllerDelegate {
-    func didSelectCategory(_ category: TrackerCategoryCD) {
-        self.selectedCategory = category.title ?? ""  
-        DispatchQueue.main.async {
-            self.categoryAndScheduleTableView.reloadData()
-            self.updateCreateButtonStateIfNeeded()
-        }
-    }
-}
 
 // MARK: - UICollectionViewDataSource
 
@@ -524,7 +502,6 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
                     }
                 }
             }
-            
             self.updateCreateButtonStateIfNeeded()
         }
     }
@@ -551,5 +528,31 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
 extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.bounds.width, height: Constants.headerHeight)
+    }
+}
+
+// MARK: - CategorySelectViewControllerDelegate
+
+extension CreateTrackerViewController: CategorySelectViewControllerDelegate {
+    func didSelectCategory(_ category: TrackerCategoryCD) {
+        self.selectedCategory = category.title ?? ""
+        DispatchQueue.main.async {
+            self.categoryAndScheduleTableView.reloadData()
+            self.updateCreateButtonStateIfNeeded()
+        }
+    }
+}
+
+// MARK: - ScheduleSelectViewControllerDelegate
+
+extension CreateTrackerViewController: ScheduleSelectViewControllerDelegate {
+    func didChooseSchedule(_ days: [WeekDay]) {
+        selectedScheduleDays = days
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.categoryAndScheduleTableView.reloadData()
+
+        }
+        self.updateCreateButtonStateIfNeeded()
     }
 }

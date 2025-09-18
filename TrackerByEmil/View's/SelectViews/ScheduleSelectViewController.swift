@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol ScheduleSelectViewControllerDelegate: AnyObject {
+    func didChooseSchedule(_ days: [WeekDay])
+}
+
 final class ScheduleSelectViewController: UIViewController {
     
     // MARK: - Layout Constants
@@ -26,7 +30,7 @@ final class ScheduleSelectViewController: UIViewController {
     
     // MARK: - Properties
     
-    var delegate: CreateTrackerViewController?
+    weak var delegate: ScheduleSelectViewControllerDelegate?
     var selectedDays: Set<WeekDay> = []
     
     //MARK: - UI Element's
