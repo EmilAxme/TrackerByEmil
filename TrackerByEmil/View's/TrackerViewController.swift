@@ -40,6 +40,7 @@ final class TrackerViewController: UIViewController {
         static let screenTitle = "trackers_title".localized
         static let searchPlaceholder = "search_placeholder".localized
         static let stubText = "stub_text".localized
+        static let filterButton = "filter_button".localized
     }
     
     // MARK: - Properties
@@ -67,11 +68,22 @@ final class TrackerViewController: UIViewController {
     
     // MARK: - UI Elements
     
+    private lazy var filterButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.backgroundColor = UIColor(named: "Blue")
+        button.setTitle(Constants.filterButton, for: .normal)
+        button.setTitleColor(.ypWhite, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
+        button.layer.cornerRadius = 16
+        button.layer.masksToBounds = true
+        button.addTarget(self, action: #selector(filterTapped), for: .touchUpInside)
+        return button
+    }()
+    
     private lazy var datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = UIDatePickerStyle.compact
-        datePicker.locale = Locale(identifier: "ru_RU")
         datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
         return datePicker
     }()
@@ -115,6 +127,7 @@ final class TrackerViewController: UIViewController {
         searchBar.searchTextField.layer.cornerRadius = Constants.smallCornerRadius
         searchBar.searchTextField.layer.masksToBounds = true
         searchBar.searchTextField.textColor = .ypBlack
+        searchBar.searchTextField.addTarget(self, action: #selector(textDidChange), for: .editingChanged)
         return searchBar
     }()
     
@@ -169,6 +182,21 @@ final class TrackerViewController: UIViewController {
         updateVisibleCategories()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        trackerCollection.alwaysBounceVertical = true
+        
+        let bottomInset = filterButton.bounds.height + 16
+        
+        if trackerCollection.contentInset.bottom != bottomInset {
+            trackerCollection.contentInset.bottom = bottomInset
+            trackerCollection.scrollIndicatorInsets.bottom = bottomInset
+        }
+        
+        view.bringSubviewToFront(filterButton)
+    }
+    
     // MARK: - Private Methods
     
     private func setupDependenciesIfNeeded() {
@@ -186,8 +214,8 @@ final class TrackerViewController: UIViewController {
     }
     
     private func setupUI() {
-        
-        [labelAndSearchBarStackView,
+        [filterButton,
+         labelAndSearchBarStackView,
          trackerCollection,
          datePicker,
          dateLabel,
@@ -197,12 +225,19 @@ final class TrackerViewController: UIViewController {
             view.addToView($0)
         }
         
+        view.bringSubviewToFront(filterButton)
+        
         let screenSize = UIScreen.main.bounds.size
         let diagonal = sqrt(pow(screenSize.width, 2) + pow(screenSize.height, 2))
         let dynamicTopPadding = diagonal * Constants.scalingFactor
         
         NSLayoutConstraint.activate([
             stubImage.widthAnchor.constraint(equalToConstant: Constants.stubImageSize),
+            
+            filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            filterButton.heightAnchor.constraint(equalToConstant: 50),
+            filterButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 100),
             
             stubStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             stubStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -235,6 +270,8 @@ final class TrackerViewController: UIViewController {
             trackerCollection.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
+
+
     
 
     
@@ -366,7 +403,54 @@ final class TrackerViewController: UIViewController {
         updateVisibleCategories()
     }
     
+    @objc func textDidChange(_ searchField: UISearchTextField) {
+        if let searchText = searchField.text, !searchText.isEmpty {
+            // Фильтруем по тексту
+            visibleCategories = categories.compactMap { category in
+                let filteredTrackers = category.trackerOfCategory.filter {
+                    $0.name.lowercased().contains(searchText.lowercased())
+                }
+                return filteredTrackers.isEmpty ? nil : TrackerCategory(
+                    title: category.title,
+                    trackerOfCategory: filteredTrackers
+                )
+            }
+        } else {
+            // Восстанавливаем исходное состояние с учётом выбранной даты
+            let calendar = Calendar.current
+            let filteredWeekDay = calendar.component(.weekday, from: datePicker.date)
+            
+            visibleCategories = categories.compactMap { category in
+                let trackersForDay = category.trackerOfCategory.filter { tracker in
+                    tracker.schedule.contains { $0.rawValue == filteredWeekDay }
+                }
+                return trackersForDay.isEmpty ? nil : TrackerCategory(title: category.title, trackerOfCategory: trackersForDay)
+            }
+        }
+        trackerCollection.reloadData()
+    }
+    
+    @objc private func filterTapped() {
+        // TODO: -
+    }
+    
     // MARK: - Public Methods
+    
+    func updateTracker(_ updated: Tracker, to categoryTitle: String) {
+        guard let trackerProvider else {
+            assertionFailure("TrackerProvider is not initialized")
+            return
+        }
+
+        do {
+            let category = try fetchOrCreateCategory(title: categoryTitle)
+            try trackerProvider.updateTracker(updated, to: category) // метод обновит сущность в CoreData
+            loadTrackersFromCoreData()                // перезагружаем категории из CoreData
+            updateVisibleCategories()                 // пересчитываем видимые категории
+        } catch {
+            print("Ошибка при обновлении трекера: \(error)")
+        }
+    }
     
     func addNewTracker(_ tracker: Tracker, to categoryTitle: String) {
         guard let trackerProvider else {
@@ -508,6 +592,74 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: Constants.headerWidth, height: Constants.headerHeight)
+    }
+}
+
+// MARK: - UICollectionViewDelegate
+
+extension TrackerViewController: UICollectionViewDelegate {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first else { return nil }
+
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+            guard let self = self else {
+                return UIMenu(title: "", children: []) // пустое меню вместо nil
+            }
+
+            // Получаем трекер из visibleCategories
+            let tracker = self.visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
+
+            // Редактировать
+            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
+                let tracker = self.visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
+                let categoryTitle = self.visibleCategories[indexPath.section].title
+                let completedDays = self.completedTrackers.filter { $0.id == tracker.id }.count
+                
+                let editViewModel = EditTrackerViewModel(tracker: tracker, category: categoryTitle, completedDays: completedDays)
+                let editVC = EditTrackerViewController(viewModel: editViewModel)
+                editVC.delegate = self
+                
+                let navController = UINavigationController(rootViewController: editVC)
+                self.present(navController, animated: true)
+            }
+
+            // Удалить
+            let deleteAction = UIAction(
+                title: "Удалить",
+                image: UIImage(systemName: "trash"),
+                attributes: .destructive
+            ) { _ in
+                let alert = UIAlertController(
+                    title: "Удалить",
+                    message: "Уверены что хотите удалить трекер?",
+                    preferredStyle: .actionSheet
+                )
+
+                alert.addAction(UIAlertAction(
+                    title: "Удалить",
+                    style: .destructive,
+                    handler: { _ in
+                        let trackerToDelete = self.visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
+                        do {
+                            try self.trackerProvider?.deleteTracker(trackerToDelete)
+                            self.loadTrackersFromCoreData()
+                            self.updateVisibleCategories()
+                        } catch {
+                            print("Ошибка при удалении трекера: \(error)")
+                        }
+                    }
+                ))
+
+                alert.addAction(UIAlertAction(title: "Отменить", style: .cancel))
+                self.present(alert, animated: true)
+            }
+
+            return UIMenu(title: "", children: [editAction, deleteAction])
+        }
     }
 }
 
