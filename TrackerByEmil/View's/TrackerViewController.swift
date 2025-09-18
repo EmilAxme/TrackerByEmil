@@ -449,33 +449,51 @@ final class TrackerViewController: UIViewController {
     }
     
     @objc private func dateChanged() {
+        trackerSearchBar.text = ""
+        textDidChange(trackerSearchBar.searchTextField)
         updateVisibleCategories()
     }
     
     @objc func textDidChange(_ searchField: UISearchTextField) {
+        let calendar = Calendar.current
+        let filteredWeekDay = calendar.component(.weekday, from: datePicker.date)
+        
+        // Сначала фильтруем по дате
+        var filteredCategories = categories.compactMap { category -> TrackerCategory? in
+            let trackersForDay = category.trackerOfCategory.filter { tracker in
+                tracker.schedule.contains { $0.rawValue == filteredWeekDay }
+            }
+            return trackersForDay.isEmpty ? nil : TrackerCategory(title: category.title,
+                                                                  trackerOfCategory: trackersForDay)
+        }
+        
+        // Потом по тексту (если не пустая строка поиска)
         if let searchText = searchField.text, !searchText.isEmpty {
-            // Фильтруем по тексту
-            visibleCategories = categories.compactMap { category in
+            filteredCategories = filteredCategories.compactMap { category -> TrackerCategory? in
                 let filteredTrackers = category.trackerOfCategory.filter {
                     $0.name.lowercased().contains(searchText.lowercased())
                 }
-                return filteredTrackers.isEmpty ? nil : TrackerCategory(
-                    title: category.title,
-                    trackerOfCategory: filteredTrackers
-                )
-            }
-        } else {
-            // Восстанавливаем исходное состояние с учётом выбранной даты
-            let calendar = Calendar.current
-            let filteredWeekDay = calendar.component(.weekday, from: datePicker.date)
-            
-            visibleCategories = categories.compactMap { category in
-                let trackersForDay = category.trackerOfCategory.filter { tracker in
-                    tracker.schedule.contains { $0.rawValue == filteredWeekDay }
-                }
-                return trackersForDay.isEmpty ? nil : TrackerCategory(title: category.title, trackerOfCategory: trackersForDay)
+                return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title,
+                                                                        trackerOfCategory: filteredTrackers)
             }
         }
+        
+        visibleCategories = filteredCategories
+        
+        // Обновляем заглушку
+        if visibleCategories.isEmpty {
+            stubStackView.isHidden = false
+            if let searchText = searchField.text, !searchText.isEmpty {
+                stubLabel.text = "Ничего не найдено"
+                stubImage.image = UIImage(resource: .nenahod)
+            } else {
+                stubLabel.text = Constants.stubText
+                stubImage.image = UIImage(resource: .stub)
+            }
+        } else {
+            stubStackView.isHidden = true
+        }
+        
         trackerCollection.reloadData()
     }
     
