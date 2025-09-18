@@ -60,6 +60,7 @@ final class TrackerViewController: UIViewController {
     
     var currentDate = Date()
     
+    private var selectedFilter: TrackerFilter = .all
     private var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yy"
@@ -296,17 +297,6 @@ final class TrackerViewController: UIViewController {
         )
     }
     
-    private func commitCompletedTracker(id: UUID) {
-        let trackerRecord = TrackerRecord(id: id, date: Date())
-        completedTrackers.append(trackerRecord)
-    }
-    
-    private func removeCompletedTracker(id: UUID) {
-        if let index = completedTrackers.firstIndex(where: { $0.id == id }) {
-            completedTrackers.remove(at: index)
-        }
-    }
-    
     private func showAddNewTrackerVC() {
         let secondVC = AddTrackerViewController()
         secondVC.delegate = self
@@ -393,6 +383,65 @@ final class TrackerViewController: UIViewController {
         completedTrackers = trackerRecordProvider.fetchAllRecords()
     }
     
+    private func applyFilter() {
+        let calendar = Calendar.current
+        var targetDate = datePicker.date
+        let weekday = calendar.component(.weekday, from: targetDate)
+        
+        switch selectedFilter {
+        case .all:
+            // Все трекеры по выбранному дню недели
+            visibleCategories = categories.compactMap { category in
+                let trackersForDay = category.trackerOfCategory.filter { tracker in
+                    tracker.schedule.contains { $0.rawValue == weekday }
+                }
+                return trackersForDay.isEmpty ? nil : TrackerCategory(title: category.title, trackerOfCategory: trackersForDay)
+            }
+            
+        case .today:
+            // Переключаем календарь на сегодня и сбрасываем фильтр
+            targetDate = Date()
+            datePicker.date = targetDate
+            updateDateField()
+            
+            let todayWeekday = calendar.component(.weekday, from: targetDate)
+            visibleCategories = categories.compactMap { category in
+                let trackersForDay = category.trackerOfCategory.filter { tracker in
+                    tracker.schedule.contains { $0.rawValue == todayWeekday }
+                }
+                return trackersForDay.isEmpty ? nil : TrackerCategory(title: category.title, trackerOfCategory: trackersForDay)
+            }
+            
+        case .completed:
+            // Только завершённые на выбранную дату
+            visibleCategories = categories.compactMap { category in
+                let trackersForDay = category.trackerOfCategory.filter { tracker in
+                    tracker.schedule.contains { $0.rawValue == weekday } &&
+                    completedTrackers.contains { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: targetDate) }
+                }
+                return trackersForDay.isEmpty ? nil : TrackerCategory(title: category.title, trackerOfCategory: trackersForDay)
+            }
+            
+        case .uncompleted:
+            // Только НЕ завершённые на выбранную дату
+            visibleCategories = categories.compactMap { category in
+                let trackersForDay = category.trackerOfCategory.filter { tracker in
+                    tracker.schedule.contains { $0.rawValue == weekday } &&
+                    !completedTrackers.contains { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: targetDate) }
+                }
+                return trackersForDay.isEmpty ? nil : TrackerCategory(title: category.title, trackerOfCategory: trackersForDay)
+            }
+        }
+        
+        // Проверяем пустое состояние
+        if visibleCategories.isEmpty {
+            updateStubVisibility()
+        } else {
+            updateStubVisibility()
+        }
+        
+        trackerCollection.reloadData()
+    }
     // MARK: - Actions
     
     @objc private func addTrackerButtonAction() {
@@ -431,7 +480,14 @@ final class TrackerViewController: UIViewController {
     }
     
     @objc private func filterTapped() {
-        // TODO: -
+        let filterVC = FilterViewController(selectedFilter: selectedFilter)
+        filterVC.onFilterSelected = { [weak self] filter in
+            guard let self else { return }
+            self.selectedFilter = filter
+            self.applyFilter()
+        }
+        let nav = UINavigationController(rootViewController: filterVC)
+        present(nav, animated: true)
     }
     
     // MARK: - Public Methods
