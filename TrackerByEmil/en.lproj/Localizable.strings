@@ -43,6 +43,9 @@
 "emoji_section_title" = "Emoji";
 "color_section_title" = "Color";
 
+"edit_habit_title" = "Edit Habit";
+"save_button" = "Save";
+
 "new_habit_title" = "New Habit";
 "tracker_name_placeholder" = "Enter tracker name";
 "cancel_button" = "Cancel";
@@ -60,3 +63,4 @@
 
 "trackers_title" = "Trackers";
 "search_placeholder" = "Search";
+"filter_button" = "Filters";

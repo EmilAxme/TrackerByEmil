@@ -43,6 +43,9 @@
 "emoji_section_title" = "Emoji";
 "color_section_title" = "Цвет";
 
+"edit_habit_title" = "Редактирование привычки";
+"save_button" = "Сохранить";
+
 "new_habit_title" = "Новая привычка";
 "tracker_name_placeholder" = "Введите название трекера";
 "cancel_button" = "Отменить";
@@ -61,3 +64,4 @@
 "trackers_title" = "Трекеры";
 "search_placeholder" = "Поиск";
 "stub_text" = "Что будем отслеживать?";
+"filter_button" = "Фильтры";
