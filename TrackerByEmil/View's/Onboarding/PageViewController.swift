@@ -29,7 +29,7 @@ class PageViewController: UIPageViewController {
     // MARK: - UI Elements
     private lazy var jumpButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .ypBlack
+        button.backgroundColor = .black
         button.setTitle(Constants.jumpButtonTitle, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.addTarget(self, action: #selector(handleJump), for: .touchUpInside)
