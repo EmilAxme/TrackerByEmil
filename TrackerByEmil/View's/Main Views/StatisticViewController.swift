@@ -10,14 +10,14 @@ import UIKit
 final class StatisticViewController: UIViewController {
     
     private enum Constants {
-        static let topAnchor = 24
-        
         static let titleLabel = "statistic_title".localized
-        static let bestPeriod = "statistic_best_period".localized
-        static let perfectDays = "statistic_perfect_days".localized
         static let completedTrackers = "statistic_completed_trackers".localized
-        static let averageValue = "statistic_average_value".localized
+        static let stubLabel = "statistic_stub_label".localized
     }
+    
+    // MARK: - Properties
+    
+    private let statsStore = TrackerStatsStore()
     
     // MARK: - UI
     
@@ -30,15 +30,28 @@ final class StatisticViewController: UIViewController {
     }()
     
     private lazy var metricsStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [
-            makeMetricView(value: "6", description: Constants.bestPeriod),
-            makeMetricView(value: "2", description: Constants.perfectDays),
-            makeMetricView(value: "5", description: Constants.completedTrackers),
-            makeMetricView(value: "4", description: Constants.averageValue)
-        ])
+        let stack = UIStackView()
         stack.axis = .vertical
         stack.spacing = 12
         return stack
+    }()
+    
+    private lazy var stubImage: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "Pechalik")
+        imageView.contentMode = .scaleAspectFit
+        imageView.isHidden = true
+        return imageView
+    }()
+    
+    private lazy var stubLabel: UILabel = {
+        let label = UILabel()
+        label.text = Constants.stubLabel
+        label.font = .systemFont(ofSize: 12, weight: .regular)
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.isHidden = true
+        return label
     }()
     
     // MARK: - Lifecycle
@@ -50,12 +63,35 @@ final class StatisticViewController: UIViewController {
         setupLayout()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateMetrics()
+    }
+    
     // MARK: - Private
     
+    private func updateMetrics() {
+        let stat = statsStore.getCompletedCount()
+        
+        metricsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        if stat == 0 {
+            metricsStack.isHidden = true
+            stubImage.isHidden = false
+            stubLabel.isHidden = false
+        } else {
+            metricsStack.isHidden = false
+            stubImage.isHidden = true
+            stubLabel.isHidden = true
+            
+            let view = makeMetricView(value: String(stat), description: Constants.completedTrackers)
+            metricsStack.addArrangedSubview(view)
+        }
+    }
+    
     private func setupLayout() {
-        [titleLabel, metricsStack].forEach {
-            view.addSubview($0)
-            $0.translatesAutoresizingMaskIntoConstraints = false
+        [titleLabel, metricsStack, stubImage, stubLabel].forEach {
+            view.addToView($0)
         }
         
         NSLayoutConstraint.activate([
@@ -64,7 +100,17 @@ final class StatisticViewController: UIViewController {
             
             metricsStack.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             metricsStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            metricsStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+            metricsStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            stubImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stubImage.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -40),
+            stubImage.widthAnchor.constraint(equalToConstant: 80),
+            stubImage.heightAnchor.constraint(equalToConstant: 80),
+            
+            stubLabel.topAnchor.constraint(equalTo: stubImage.bottomAnchor, constant: 8),
+            stubLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stubLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 16),
+            stubLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -16)
         ])
     }
     
