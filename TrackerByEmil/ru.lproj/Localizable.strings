@@ -65,6 +65,7 @@
 "search_placeholder" = "Поиск";
 "stub_text" = "Что будем отслеживать?";
 "filter_button" = "Фильтры";
+"nenahod_text" = "Ничего не найдено";
 
 "statistic_title" = "Статистика";
 "statistic_best_period" = "Лучший период";

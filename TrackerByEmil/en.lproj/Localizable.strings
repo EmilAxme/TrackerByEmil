@@ -64,6 +64,7 @@
 "trackers_title" = "Trackers";
 "search_placeholder" = "Search";
 "filter_button" = "Filters";
+"nenahod_text" = "Nothing found";
 
 "statistic_title" = "Statistic";
 "statistic_best_period" = "Best period";
