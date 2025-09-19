@@ -12,6 +12,7 @@ import AppMetricaCore
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+    let filterStorage = FilterStorage()
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
@@ -23,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         let configuration = AppMetricaConfiguration(apiKey: "2cd7b5b3-a1a0-4425-b9b2-c721f8b993ec")
         AppMetrica.activate(with: configuration!)
+        filterStorage.reset()
         window?.makeKeyAndVisible()
         return true
     }
