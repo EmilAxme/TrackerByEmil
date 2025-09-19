@@ -67,10 +67,8 @@
 "nenahod_text" = "Nothing found";
 
 "statistic_title" = "Statistic";
-"statistic_best_period" = "Best period";
-"statistic_perfect_days" = "Perfect days";
 "statistic_completed_trackers" = "Completed trackers";
-"statistic_average_value" = "Average value";
+"statistic_stub_label" = "There is nothing to analyze yet";
 
 "filter_title" = "Filters";
 "all_trackers_filter_title" = "All trackers";

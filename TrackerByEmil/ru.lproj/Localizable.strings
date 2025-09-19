@@ -68,10 +68,8 @@
 "nenahod_text" = "Ничего не найдено";
 
 "statistic_title" = "Статистика";
-"statistic_best_period" = "Лучший период";
-"statistic_perfect_days" = "Идеальные дни";
 "statistic_completed_trackers" = "Трекеров завершено";
-"statistic_average_value" = "Среднее значение";
+"statistic_stub_label" = "Анализировать пока нечего";
 
 "filter_title" = "Фильтры";
 "all_trackers_filter_title" = "Все трекеры";
