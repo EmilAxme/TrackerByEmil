@@ -13,6 +13,9 @@
 		20767A7E2E7C71AC00F300C6 /* AppMetricaLibraryAdapter in Frameworks */ = {isa = PBXBuildFile; productRef = 20767A7D2E7C71AC00F300C6 /* AppMetricaLibraryAdapter */; };
 		20767A802E7C71AC00F300C6 /* AppMetricaScreenshot in Frameworks */ = {isa = PBXBuildFile; productRef = 20767A7F2E7C71AC00F300C6 /* AppMetricaScreenshot */; };
 		20767A822E7C71AC00F300C6 /* AppMetricaWebKit in Frameworks */ = {isa = PBXBuildFile; productRef = 20767A812E7C71AC00F300C6 /* AppMetricaWebKit */; };
+		20767AE92E7DA94600F300C6 /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 20767AE82E7DA94600F300C6 /* InlineSnapshotTesting */; };
+		20767AEB2E7DA94600F300C6 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 20767AEA2E7DA94600F300C6 /* SnapshotTesting */; };
+		20767AED2E7DA94600F300C6 /* SnapshotTestingCustomDump in Frameworks */ = {isa = PBXBuildFile; productRef = 20767AEC2E7DA94600F300C6 /* SnapshotTestingCustomDump */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,12 +33,20 @@
 			remoteGlobalIDString = 206086B62DEC64E800FC6B92;
 			remoteInfo = TrackerByEmil;
 		};
+		20767AE22E7DA91A00F300C6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 206086AF2DEC64E800FC6B92 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 206086B62DEC64E800FC6B92;
+			remoteInfo = TrackerByEmil;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		206086B72DEC64E800FC6B92 /* TrackerByEmil.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackerByEmil.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		206086D02DEC64EA00FC6B92 /* TrackerByEmilTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerByEmilTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		206086DA2DEC64EA00FC6B92 /* TrackerByEmilUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerByEmilUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		20767ADE2E7DA91A00F300C6 /* ScreenShotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScreenShotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -65,6 +76,11 @@
 		206086DD2DEC64EA00FC6B92 /* TrackerByEmilUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = TrackerByEmilUITests;
+			sourceTree = "<group>";
+		};
+		20767ADF2E7DA91A00F300C6 /* ScreenShotTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ScreenShotTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -97,6 +113,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		20767ADB2E7DA91A00F300C6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				20767AED2E7DA94600F300C6 /* SnapshotTestingCustomDump in Frameworks */,
+				20767AE92E7DA94600F300C6 /* InlineSnapshotTesting in Frameworks */,
+				20767AEB2E7DA94600F300C6 /* SnapshotTesting in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -106,6 +132,7 @@
 				206086B92DEC64E800FC6B92 /* TrackerByEmil */,
 				206086D32DEC64EA00FC6B92 /* TrackerByEmilTests */,
 				206086DD2DEC64EA00FC6B92 /* TrackerByEmilUITests */,
+				20767ADF2E7DA91A00F300C6 /* ScreenShotTests */,
 				206086B82DEC64E800FC6B92 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -117,6 +144,7 @@
 				206086B72DEC64E800FC6B92 /* TrackerByEmil.app */,
 				206086D02DEC64EA00FC6B92 /* TrackerByEmilTests.xctest */,
 				206086DA2DEC64EA00FC6B92 /* TrackerByEmilUITests.xctest */,
+				20767ADE2E7DA91A00F300C6 /* ScreenShotTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -198,6 +226,32 @@
 			productReference = 206086DA2DEC64EA00FC6B92 /* TrackerByEmilUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		20767ADD2E7DA91A00F300C6 /* ScreenShotTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 20767AE42E7DA91A00F300C6 /* Build configuration list for PBXNativeTarget "ScreenShotTests" */;
+			buildPhases = (
+				20767ADA2E7DA91A00F300C6 /* Sources */,
+				20767ADB2E7DA91A00F300C6 /* Frameworks */,
+				20767ADC2E7DA91A00F300C6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				20767AE32E7DA91A00F300C6 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				20767ADF2E7DA91A00F300C6 /* ScreenShotTests */,
+			);
+			name = ScreenShotTests;
+			packageProductDependencies = (
+				20767AE82E7DA94600F300C6 /* InlineSnapshotTesting */,
+				20767AEA2E7DA94600F300C6 /* SnapshotTesting */,
+				20767AEC2E7DA94600F300C6 /* SnapshotTestingCustomDump */,
+			);
+			productName = ScreenShotTests;
+			productReference = 20767ADE2E7DA91A00F300C6 /* ScreenShotTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -219,6 +273,10 @@
 						CreatedOnToolsVersion = 16.2;
 						TestTargetID = 206086B62DEC64E800FC6B92;
 					};
+					20767ADD2E7DA91A00F300C6 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 206086B62DEC64E800FC6B92;
+					};
 				};
 			};
 			buildConfigurationList = 206086B22DEC64E800FC6B92 /* Build configuration list for PBXProject "TrackerByEmil" */;
@@ -233,6 +291,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				20767A762E7C71AC00F300C6 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
+				20767AE72E7DA94600F300C6 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 206086B82DEC64E800FC6B92 /* Products */;
@@ -242,6 +301,7 @@
 				206086B62DEC64E800FC6B92 /* TrackerByEmil */,
 				206086CF2DEC64EA00FC6B92 /* TrackerByEmilTests */,
 				206086D92DEC64EA00FC6B92 /* TrackerByEmilUITests */,
+				20767ADD2E7DA91A00F300C6 /* ScreenShotTests */,
 			);
 		};
 /* End PBXProject section */
@@ -262,6 +322,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		206086D82DEC64EA00FC6B92 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		20767ADC2E7DA91A00F300C6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -292,6 +359,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		20767ADA2E7DA91A00F300C6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -304,6 +378,11 @@
 			isa = PBXTargetDependency;
 			target = 206086B62DEC64E800FC6B92 /* TrackerByEmil */;
 			targetProxy = 206086DB2DEC64EA00FC6B92 /* PBXContainerItemProxy */;
+		};
+		20767AE32E7DA91A00F300C6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 206086B62DEC64E800FC6B92 /* TrackerByEmil */;
+			targetProxy = 20767AE22E7DA91A00F300C6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -561,6 +640,42 @@
 			};
 			name = Release;
 		};
+		20767AE52E7DA91A00F300C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 25KRQ5465G;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.EmilAxme.ScreenShotTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TrackerByEmil.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TrackerByEmil";
+			};
+			name = Debug;
+		};
+		20767AE62E7DA91A00F300C6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 25KRQ5465G;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.EmilAxme.ScreenShotTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TrackerByEmil.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TrackerByEmil";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -600,6 +715,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		20767AE42E7DA91A00F300C6 /* Build configuration list for PBXNativeTarget "ScreenShotTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				20767AE52E7DA91A00F300C6 /* Debug */,
+				20767AE62E7DA91A00F300C6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -609,6 +733,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.12.1;
+			};
+		};
+		20767AE72E7DA94600F300C6 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.18.7;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -643,6 +775,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 20767A762E7C71AC00F300C6 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
 			productName = AppMetricaWebKit;
+		};
+		20767AE82E7DA94600F300C6 /* InlineSnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 20767AE72E7DA94600F300C6 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = InlineSnapshotTesting;
+		};
+		20767AEA2E7DA94600F300C6 /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 20767AE72E7DA94600F300C6 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		20767AEC2E7DA94600F300C6 /* SnapshotTestingCustomDump */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 20767AE72E7DA94600F300C6 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTestingCustomDump;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
