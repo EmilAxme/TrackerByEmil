@@ -25,4 +25,15 @@ final class ScreenShotTests: XCTestCase {
         assertSnapshot(of: vc, as: .image)                                    // 2
     }
 
+    func testViewControllerDarkMode() {
+        let vc = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()!
+        
+        assertSnapshot(
+            of: vc,
+            as: .image(traits: .init(userInterfaceStyle: .dark)),
+            named: "dark"
+        )
+    }
+    
 }
+
