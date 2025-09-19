@@ -54,8 +54,10 @@ final class TrackerViewController: UIViewController {
     var categories: [TrackerCategory] = [] {
         didSet {
             updateStubVisibility()
+            updateFilterButtonVisibility()
         }
     }
+    
     var visibleCategories: [TrackerCategory] = []
     var completedTrackers: [TrackerRecord] = []
     private var selectedFilter: TrackerFilter = .all
@@ -174,6 +176,8 @@ final class TrackerViewController: UIViewController {
         setupCollectionView()
         setupUI()
 
+        selectedFilter = FilterStorage().load()
+        
         loadTrackersFromCoreData()
         loadCompletedTrackers()
         updateVisibleCategories()
@@ -399,6 +403,20 @@ final class TrackerViewController: UIViewController {
         stubImage.image = UIImage(resource: .nenahod)
     }
     
+    private func updateFilterButtonVisibility() {
+        let calendar = Calendar.current
+        let targetDate = datePicker.date
+        let weekday = calendar.component(.weekday, from: targetDate)
+        
+        let hasTrackersForDay = categories.contains { category in
+            category.trackerOfCategory.contains { tracker in
+                tracker.schedule.contains { $0.rawValue == weekday }
+            }
+        }
+        
+        filterButton.isHidden = !hasTrackersForDay
+    }
+    
     private func applyFilter() {
         let calendar = Calendar.current
         var targetDate = datePicker.date
@@ -406,7 +424,6 @@ final class TrackerViewController: UIViewController {
         
         switch selectedFilter {
         case .all:
-            // Все трекеры по выбранному дню недели
             visibleCategories = categories.compactMap { category in
                 let trackersForDay = category.trackerOfCategory.filter { tracker in
                     tracker.schedule.contains { $0.rawValue == weekday }
@@ -415,7 +432,6 @@ final class TrackerViewController: UIViewController {
             }
             
         case .today:
-            // Переключаем календарь на сегодня и сбрасываем фильтр
             targetDate = Date()
             datePicker.date = targetDate
             updateDateField()
@@ -429,7 +445,6 @@ final class TrackerViewController: UIViewController {
             }
             
         case .completed:
-            // Только завершённые на выбранную дату
             visibleCategories = categories.compactMap { category in
                 let trackersForDay = category.trackerOfCategory.filter { tracker in
                     tracker.schedule.contains { $0.rawValue == weekday } &&
@@ -439,7 +454,6 @@ final class TrackerViewController: UIViewController {
             }
             
         case .uncompleted:
-            // Только НЕ завершённые на выбранную дату
             visibleCategories = categories.compactMap { category in
                 let trackersForDay = category.trackerOfCategory.filter { tracker in
                     tracker.schedule.contains { $0.rawValue == weekday } &&
@@ -449,7 +463,6 @@ final class TrackerViewController: UIViewController {
             }
         }
         
-        // Проверяем пустое состояние
         if visibleCategories.isEmpty {
             updateStubVisibility()
             nullSearchStub()
@@ -470,13 +483,17 @@ final class TrackerViewController: UIViewController {
         trackerSearchBar.text = ""
         textDidChange(trackerSearchBar.searchTextField)
         updateVisibleCategories()
+        updateFilterButtonVisibility()
+        if selectedFilter != .today {
+            applyFilter()
+        }
+        print(selectedFilter)
     }
     
     @objc func textDidChange(_ searchField: UISearchTextField) {
         let calendar = Calendar.current
         let filteredWeekDay = calendar.component(.weekday, from: datePicker.date)
         
-        // Сначала фильтруем по дате
         var filteredCategories = categories.compactMap { category -> TrackerCategory? in
             let trackersForDay = category.trackerOfCategory.filter { tracker in
                 tracker.schedule.contains { $0.rawValue == filteredWeekDay }
@@ -485,7 +502,6 @@ final class TrackerViewController: UIViewController {
                                                                   trackerOfCategory: trackersForDay)
         }
         
-        // Потом по тексту (если не пустая строка поиска)
         if let searchText = searchField.text, !searchText.isEmpty {
             filteredCategories = filteredCategories.compactMap { category -> TrackerCategory? in
                 let filteredTrackers = category.trackerOfCategory.filter {
@@ -498,7 +514,6 @@ final class TrackerViewController: UIViewController {
         
         visibleCategories = filteredCategories
         
-        // Обновляем заглушку
         if visibleCategories.isEmpty {
             stubStackView.isHidden = false
             if let searchText = searchField.text, !searchText.isEmpty {
@@ -536,12 +551,13 @@ final class TrackerViewController: UIViewController {
 
         do {
             let category = try fetchOrCreateCategory(title: categoryTitle)
-            try trackerProvider.updateTracker(updated, to: category) // метод обновит сущность в CoreData
-            loadTrackersFromCoreData()                // перезагружаем категории из CoreData
-            updateVisibleCategories()                 // пересчитываем видимые категории
+            try trackerProvider.updateTracker(updated, to: category)
+            loadTrackersFromCoreData()
+            updateVisibleCategories()
         } catch {
             print("Ошибка при обновлении трекера: \(error)")
         }
+        applyFilter()
     }
     
     func addNewTracker(_ tracker: Tracker, to categoryTitle: String) {
@@ -561,6 +577,7 @@ final class TrackerViewController: UIViewController {
         } catch {
             print("Ошибка при сохранении трекера: \(error)")
         }
+        applyFilter()
     }
     
     func loadTrackersFromCoreData() {
@@ -704,10 +721,6 @@ extension TrackerViewController: UICollectionViewDelegate {
                 return UIMenu(title: "", children: []) // пустое меню вместо nil
             }
 
-            // Получаем трекер из visibleCategories
-            let tracker = self.visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
-
-            // Редактировать
             let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
                 AnalyticsService.shared.reportEvent(event: .click, screen: .main, item: .edit)
                 let tracker = self.visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]

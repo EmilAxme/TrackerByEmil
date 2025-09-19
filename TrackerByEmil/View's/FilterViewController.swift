@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum TrackerFilter: Equatable {
+enum TrackerFilter: Equatable, CaseIterable {
     case all
     case today
     case completed
@@ -116,6 +116,10 @@ extension FilterViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let chosenFilter = filters[indexPath.row]
+        selectedFilter = chosenFilter
+        
+        FilterStorage().save(chosenFilter)
+        
         onFilterSelected?(chosenFilter)
         dismiss(animated: true)
     }
