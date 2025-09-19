@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreData
+import AppMetricaCore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -20,7 +21,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
-        
+        let configuration = AppMetricaConfiguration(apiKey: "2cd7b5b3-a1a0-4425-b9b2-c721f8b993ec")
+        AppMetrica.activate(with: configuration!)
         window?.makeKeyAndVisible()
         return true
     }
