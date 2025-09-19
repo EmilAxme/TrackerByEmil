@@ -42,9 +42,11 @@ final class TrackerViewController: UIViewController {
         static let searchPlaceholder = "search_placeholder".localized
         static let stubText = "stub_text".localized
         static let filterButton = "filter_button".localized
+        static let nenahodText = "nenahod_text".localized
     }
     
     // MARK: - Properties
+    private let statsStore = TrackerStatsStore()
     
     var coreDataStack: CoreDataStackProtocol?
     var trackerProvider: TrackerProviderProtocol?
@@ -399,22 +401,27 @@ final class TrackerViewController: UIViewController {
     }
     
     private func nullSearchStub() {
-        stubLabel.text = "Ничего не найдено"
-        stubImage.image = UIImage(resource: .nenahod)
+        let trackersToday = hasTrackerForDay()
+        
+        let showNenahod = (selectedFilter == .completed || selectedFilter == .uncompleted || selectedFilter == .today) && trackersToday
+        stubLabel.text = showNenahod ? Constants.nenahodText : Constants.stubText
+        stubImage.image = UIImage(resource: showNenahod ? .nenahod : .stub)
     }
     
     private func updateFilterButtonVisibility() {
+        filterButton.isHidden = !hasTrackerForDay()
+    }
+    
+    private func hasTrackerForDay() -> Bool {
         let calendar = Calendar.current
         let targetDate = datePicker.date
         let weekday = calendar.component(.weekday, from: targetDate)
         
-        let hasTrackersForDay = categories.contains { category in
+        return categories.contains { category in
             category.trackerOfCategory.contains { tracker in
                 tracker.schedule.contains { $0.rawValue == weekday }
             }
         }
-        
-        filterButton.isHidden = !hasTrackersForDay
     }
     
     private func applyFilter() {
@@ -517,7 +524,8 @@ final class TrackerViewController: UIViewController {
         if visibleCategories.isEmpty {
             stubStackView.isHidden = false
             if let searchText = searchField.text, !searchText.isEmpty {
-                nullSearchStub()
+                stubLabel.text = Constants.nenahodText
+                stubImage.image = UIImage(resource: .nenahod)
             } else {
                 stubLabel.text = Constants.stubText
                 stubImage.image = UIImage(resource: .stub)
@@ -640,8 +648,10 @@ extension TrackerViewController: UICollectionViewDataSource {
             do {
                 if isCompleted {
                     try self.trackerRecordProvider?.addRecord(record)
+                    self.statsStore.addCompleted()
                 } else {
                     try self.trackerRecordProvider?.removeRecord(record)
+                    self.statsStore.removeCompleted()
                 }
             } catch {
                 print("Ошибка при изменении записи: \(error)")
