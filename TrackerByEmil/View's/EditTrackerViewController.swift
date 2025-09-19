@@ -408,54 +408,51 @@ extension EditTrackerViewController: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 extension EditTrackerViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            if indexPath.section == 0 {
-                collectionView.indexPathsForSelectedItems?
-                    .filter { $0.section == 0 && $0 != indexPath }
-                    .forEach {
-                        collectionView.deselectItem(at: $0, animated: false)
-                        if let previousCell = collectionView.cellForItem(at: $0) as? TrackerEmojiColorCell {
-                            previousCell.contentView.backgroundColor = .clear
-                        }
-                    }
-                
-                self.viewModel.updateEmoji(self.emojis[indexPath.item])
-                
-                if let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiColorCell {
-                    UIView.animate(withDuration: Constants.animationDuration) {
-                        cell.layer.masksToBounds = true
-                        cell.layer.cornerRadius = Constants.emojiCornerRadius
-                        cell.contentView.backgroundColor = .ypLightGray
+        
+        if indexPath.section == 0 {
+            collectionView.indexPathsForSelectedItems?
+                .filter { $0.section == 0 && $0 != indexPath }
+                .forEach {
+                    collectionView.deselectItem(at: $0, animated: false)
+                    if let previousCell = collectionView.cellForItem(at: $0) as? TrackerEmojiColorCell {
+                        previousCell.contentView.backgroundColor = .clear
                     }
                 }
-                
-            } else if indexPath.section == 1 {
-                collectionView.indexPathsForSelectedItems?
-                    .filter { $0.section == 1 && $0 != indexPath }
-                    .forEach {
-                        collectionView.deselectItem(at: $0, animated: false)
-                        if let previousCell = collectionView.cellForItem(at: $0) as? TrackerEmojiColorCell {
-                            previousCell.layer.borderWidth = 0
-                        }
+            
+            self.viewModel.updateEmoji(self.emojis[indexPath.item])
+            
+            if let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiColorCell {
+                UIView.animate(withDuration: Constants.animationDuration) {
+                    cell.layer.masksToBounds = true
+                    cell.layer.cornerRadius = Constants.emojiCornerRadius
+                    cell.contentView.backgroundColor = .ypLightGray
+                }
+            }
+            
+        } else if indexPath.section == 1 {
+            collectionView.indexPathsForSelectedItems?
+                .filter { $0.section == 1 && $0 != indexPath }
+                .forEach {
+                    collectionView.deselectItem(at: $0, animated: false)
+                    if let previousCell = collectionView.cellForItem(at: $0) as? TrackerEmojiColorCell {
+                        previousCell.layer.borderWidth = 0
                     }
-                
-                self.viewModel.updateColor(self.colors[indexPath.item])
-                
-                if let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiColorCell {
-                    UIView.animate(withDuration: Constants.animationDuration) {
-                        cell.layer.borderColor = self.colors[indexPath.item].cgColor
-                        cell.layer.borderWidth = Constants.colorBorderWidth
-                        cell.layer.cornerRadius = Constants.colorCornerRadius
-                    }
+                }
+            
+          self.viewModel.updateColor(self.colors[indexPath.item])
+            
+            if let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiColorCell {
+                UIView.animate(withDuration: Constants.animationDuration) {
+                    cell.layer.borderColor = self.colors[indexPath.item].cgColor
+                    cell.layer.borderWidth = Constants.colorBorderWidth
+                    cell.layer.cornerRadius = Constants.colorCornerRadius
                 }
             }
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
+        DispatchQueue.main.async {
             if let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiColorCell {
                 UIView.animate(withDuration: Constants.animationDuration) {
                     if indexPath.section == 0 {

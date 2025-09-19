@@ -54,12 +54,10 @@ final class EditTrackerViewModel {
     
     func updateEmoji(_ emoji: String) {
         selectedEmoji = emoji
-        onStateChanged?()
     }
     
     func updateColor(_ color: UIColor) {
         selectedColor = color
-        onStateChanged?()
     }
     
     func updateSchedule(_ days: [WeekDay]) {
