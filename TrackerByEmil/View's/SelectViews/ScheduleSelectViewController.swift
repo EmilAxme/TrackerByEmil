@@ -65,6 +65,7 @@ final class ScheduleSelectViewController: UIViewController {
         button.layer.cornerRadius = Constants.cornerRadius
         button.addTarget(self, action: #selector(readyButtonTapped), for: .touchUpInside)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.setTitleColor(UIColor(named: "White"), for: .normal)
         return button
     }()
     
@@ -98,7 +99,7 @@ final class ScheduleSelectViewController: UIViewController {
     }
     
     private func setupAppearance() {
-        view.backgroundColor = .ypWhite
+        view.backgroundColor = .systemBackground
     }
     
     private func setupNavigation() {
