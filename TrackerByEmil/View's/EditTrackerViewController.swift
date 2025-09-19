@@ -209,7 +209,7 @@ final class EditTrackerViewController: UIViewController {
     private func updateUI() {
         completedDaysLabel.text = "\(viewModel.completedDays) дней"
         createButton.isEnabled = viewModel.isFormValid
-        createButton.backgroundColor = viewModel.isFormValid ? .ypBlack : .ypGray
+        createButton.backgroundColor = viewModel.isFormValid ? .black : .ypGray
         categoryAndScheduleTableView.reloadData()
         emojiAndColorCollectionView.reloadData()
     }
@@ -268,7 +268,7 @@ final class EditTrackerViewController: UIViewController {
     }
     
     private func setupAppearance() {
-        view.backgroundColor = .ypWhite
+        view.backgroundColor = .systemBackground
     }
     
     private func setupNavigation() {

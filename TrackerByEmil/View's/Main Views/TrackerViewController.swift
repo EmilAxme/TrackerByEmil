@@ -94,7 +94,8 @@ final class TrackerViewController: UIViewController {
         let label = UILabel()
         label.textAlignment = .center
         label.text = dateFormatter.string(from: currentDate)
-        label.backgroundColor = UIColor(named: "dateColor")
+        label.textColor = .black
+        label.backgroundColor = .date
         label.layer.cornerRadius = Constants.cornerRadius
         label.clipsToBounds = true
         label.isUserInteractionEnabled = false
@@ -128,7 +129,10 @@ final class TrackerViewController: UIViewController {
         searchBar.backgroundImage = UIImage()
         searchBar.searchTextField.layer.cornerRadius = Constants.smallCornerRadius
         searchBar.searchTextField.layer.masksToBounds = true
+        searchBar.returnKeyType = .done
         searchBar.searchTextField.textColor = .ypBlack
+        searchBar.delegate = self
+        searchBar.searchTextField.enablesReturnKeyAutomatically = false
         searchBar.searchTextField.addTarget(self, action: #selector(textDidChange), for: .editingChanged)
         return searchBar
     }()
@@ -752,6 +756,14 @@ extension TrackerViewController: UICollectionViewDelegate {
 
             return UIMenu(title: "", children: [editAction, deleteAction])
         }
+    }
+}
+
+// MARK: - UISearchBarDelegate
+
+extension TrackerViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder() // закрывает клавиатуру
     }
 }
 

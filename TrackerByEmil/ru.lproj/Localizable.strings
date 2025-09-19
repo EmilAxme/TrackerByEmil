@@ -22,7 +22,7 @@
 "error_title" = "Ошибка";
 "error_ok_action" = "Ок";
 
-"stub_text" = "Привычки и события можно объединить по смыслу?";
+"stub_category_text" = "Привычки и события можно объединить по смыслу?";
 "edit_action_title" = "Редактировать";
 
 "edit_category_placeholder" = "Название категории";

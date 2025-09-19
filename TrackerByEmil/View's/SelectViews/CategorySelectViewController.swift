@@ -39,7 +39,7 @@ final class CategorySelectViewController: UIViewController {
         static let errorOkAction = "error_ok_action".localized
         
         // Stub
-        static let stubText = "stub_text".localized
+        static let stubText = "stub_category_text".localized
         
         // Context menu
         static let editActionTitle = "edit_action_title".localized
@@ -81,6 +81,7 @@ final class CategorySelectViewController: UIViewController {
         button.layer.cornerRadius = Constants.cornerRadius
         button.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.setTitleColor(UIColor(named: "White"), for: .normal)
         return button
     }()
 
@@ -155,7 +156,7 @@ final class CategorySelectViewController: UIViewController {
     }
     
     private func setupAppearance() {
-        view.backgroundColor = .ypWhite
+        view.backgroundColor = .systemBackground
     }
     
     private func setupNavigation() {

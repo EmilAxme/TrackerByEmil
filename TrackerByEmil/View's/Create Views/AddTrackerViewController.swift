@@ -34,7 +34,7 @@ final class AddTrackerViewController: UIViewController {
         button.backgroundColor = UIColor(named: "Black")
         button.setTitle(Constants.habitButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.titleLabel?.textColor = UIColor(named: "White")
+        button.setTitleColor(UIColor(named: "White"), for: .normal)
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(addHabitButtonAction), for: .touchUpInside)
@@ -43,10 +43,10 @@ final class AddTrackerViewController: UIViewController {
     
     private lazy var addIrregularEventButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.backgroundColor = UIColor(named: "Black")
+        button.backgroundColor = .ypBlack
         button.setTitle(Constants.irregularEventButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.titleLabel?.textColor = UIColor(named: "White")
+        button.setTitleColor(UIColor(named: "White"), for: .normal)
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(addIrregularEventButtonAction), for: .touchUpInside)

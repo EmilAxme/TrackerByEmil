@@ -65,7 +65,7 @@ final class TabBarController: UITabBarController {
     
     private func addSeparatorLine() {
         let separatorLine = UIView()
-        separatorLine.backgroundColor = .lightGray
+        separatorLine.backgroundColor = .ypLightGray
         
         view.addToView(separatorLine)
         
