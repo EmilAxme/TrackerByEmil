@@ -186,10 +186,14 @@ final class CustomTrackerCell: UICollectionViewCell {
     func updateCompletionState(isCompleted: Bool) {
         let config = UIImage.SymbolConfiguration(pointSize: Layout.iconPointSize, weight: .bold)
         let imageName = isCompleted ? "checkmark" : "plus"
+        let image = UIImage(systemName: imageName, withConfiguration: config)?
+            .withRenderingMode(.alwaysTemplate)
+        doneButton.setImage(image, for: .normal)
+        doneButton.tintColor = UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark ? .black : .white
+        }
         doneButton.layer.opacity = isCompleted ? 0.5 : 1
-        doneButton.setImage(UIImage(systemName: imageName, withConfiguration: config), for: .normal)
     }
-
     // MARK: - Actions
 
     @objc private func doneButtonTapped() {
