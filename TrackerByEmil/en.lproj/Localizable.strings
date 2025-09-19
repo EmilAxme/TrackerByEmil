@@ -64,3 +64,15 @@
 "trackers_title" = "Trackers";
 "search_placeholder" = "Search";
 "filter_button" = "Filters";
+
+"statistic_title" = "Statistic";
+"statistic_best_period" = "Best period";
+"statistic_perfect_days" = "Perfect days";
+"statistic_completed_trackers" = "Completed trackers";
+"statistic_average_value" = "Average value";
+
+"filter_title" = "Filters";
+"all_trackers_filter_title" = "All trackers";
+"today_trackers_filter_title" = "Trackers for today";
+"completed_trackers_filter_title" = "Completed";
+"uncompleted_trackers_filter_title" = "Uncompleted";

@@ -65,3 +65,15 @@
 "search_placeholder" = "Поиск";
 "stub_text" = "Что будем отслеживать?";
 "filter_button" = "Фильтры";
+
+"statistic_title" = "Статистика";
+"statistic_best_period" = "Лучший период";
+"statistic_perfect_days" = "Идеальные дни";
+"statistic_completed_trackers" = "Трекеров завершено";
+"statistic_average_value" = "Среднее значение";
+
+"filter_title" = "Фильтры";
+"all_trackers_filter_title" = "Все трекеры";
+"today_trackers_filter_title" = "Трекеры на сегодня";
+"completed_trackers_filter_title" = "Завершенные";
+"uncompleted_trackers_filter_title" = "Не завершенные";

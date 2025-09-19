@@ -16,6 +16,14 @@ enum TrackerFilter: Equatable {
 
 final class FilterViewController: UIViewController {
     
+    private enum Constants {
+        static let title = "filter_title".localized
+        static let allTrackersTitle = "all_trackers_filter_title".localized
+        static let todayTrackersTitle = "today_trackers_filter_title".localized
+        static let completedTrackersTitle = "completed_trackers_filter_title".localized
+        static let uncompletedTrackersTitle = "uncompleted_trackers_filter_title".localized
+    }
+    
     private let filters: [TrackerFilter] = [.all, .today, .completed, .uncompleted]
     private var selectedFilter: TrackerFilter
     var onFilterSelected: ((TrackerFilter) -> Void)?
@@ -56,12 +64,11 @@ final class FilterViewController: UIViewController {
     
     private func configureUI() {
         title = "Фильтры"
-        view.backgroundColor = .ypWhite
-        view.addSubview(tableView)
+        view.backgroundColor = .systemBackground
+        view.addToView(tableView)
     }
     
     private func setupConstraints() {
-        tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -83,13 +90,13 @@ extension FilterViewController: UITableViewDelegate, UITableViewDataSource {
         
         switch filter {
         case .all:
-            cell.textLabel?.text = "Все трекеры"
+            cell.textLabel?.text = Constants.allTrackersTitle
         case .today:
-            cell.textLabel?.text = "Трекеры на сегодня"
+            cell.textLabel?.text = Constants.todayTrackersTitle
         case .completed:
-            cell.textLabel?.text = "Завершённые"
+            cell.textLabel?.text = Constants.completedTrackersTitle
         case .uncompleted:
-            cell.textLabel?.text = "Незавершённые"
+            cell.textLabel?.text = Constants.uncompletedTrackersTitle
         }
         
         // Правила отображения галочки
