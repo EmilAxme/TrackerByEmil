@@ -166,8 +166,8 @@ final class CreateTrackerViewController: UIViewController {
         button.setTitle(Constants.createButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .ypGray
-        button.layer.cornerRadius = Constants.cornerRadius
         button.setTitleColor(.ypWhite, for: .normal)
+        button.layer.cornerRadius = Constants.cornerRadius
         button.isEnabled = false
         button.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
         return button
@@ -193,7 +193,7 @@ final class CreateTrackerViewController: UIViewController {
     // MARK: - Private Methods
     
     private func setupAppearance() {
-        view.backgroundColor = .ypWhite
+        view.backgroundColor = .systemBackground
     }
     
     private func setupNavigation() {
@@ -313,7 +313,7 @@ final class CreateTrackerViewController: UIViewController {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 self.createButton.isEnabled = isFormNowValid
-                self.createButton.backgroundColor = isFormNowValid ? .ypBlack : .ypGray
+                self.createButton.backgroundColor = isFormNowValid ? .black : .ypGray
             }
         }
     }
