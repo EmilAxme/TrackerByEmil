@@ -212,7 +212,7 @@ final class CreateIrregularEventViewController: UIViewController {
     }
     
     private func setupAppearance() {
-        view.backgroundColor = .ypWhite
+        view.backgroundColor = .systemBackground
     }
     
     private func setupNavigation() {
