@@ -60,7 +60,8 @@ final class EditCategoryViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle(Constants.doneButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: Constants.buttonFontSize, weight: .semibold)
-        button.backgroundColor = .black
+        button.setTitleColor(UIColor(named: "White"), for: .normal)
+        button.backgroundColor = .ypBlack
         button.tintColor = .white
         button.layer.cornerRadius = Constants.buttonCornerRadius
         button.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
