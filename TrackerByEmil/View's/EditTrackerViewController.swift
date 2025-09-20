@@ -210,8 +210,6 @@ final class EditTrackerViewController: UIViewController {
         completedDaysLabel.text = "\(viewModel.completedDays) дней"
         createButton.isEnabled = viewModel.isFormValid
         createButton.backgroundColor = viewModel.isFormValid ? .black : .ypGray
-        categoryAndScheduleTableView.reloadData()
-        emojiAndColorCollectionView.reloadData()
     }
     
     // MARK: - Setup UI
