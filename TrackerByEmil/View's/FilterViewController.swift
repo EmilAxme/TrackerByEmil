@@ -99,7 +99,6 @@ extension FilterViewController: UITableViewDelegate, UITableViewDataSource {
             cell.textLabel?.text = Constants.uncompletedTrackersTitle
         }
         
-        // Правила отображения галочки
         if (filter == .completed || filter == .uncompleted) && filter == selectedFilter {
             cell.accessoryType = .checkmark
             cell.tintColor = .systemBlue

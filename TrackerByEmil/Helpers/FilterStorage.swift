@@ -12,14 +12,12 @@ final class FilterStorage {
         static let selectedFilterIndex = "selectedFilterIndex"
     }
     
-    /// Сохранить фильтр
     func save(_ filter: TrackerFilter) {
         if let index = TrackerFilter.allCases.firstIndex(of: filter) {
             UserDefaults.standard.set(index, forKey: Keys.selectedFilterIndex)
         }
     }
     
-    /// Получить сохранённый фильтр
     func load() -> TrackerFilter {
         guard let index = UserDefaults.standard.value(forKey: Keys.selectedFilterIndex) as? Int,
               index < TrackerFilter.allCases.count else {
@@ -28,7 +26,6 @@ final class FilterStorage {
         return TrackerFilter.allCases[index]
     }
     
-    /// Сбросить (например, при старте приложения)
     func reset() {
         UserDefaults.standard.removeObject(forKey: Keys.selectedFilterIndex)
     }

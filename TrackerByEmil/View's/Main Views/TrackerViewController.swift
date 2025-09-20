@@ -764,77 +764,11 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-// MARK: - UICollectionViewDelegate
-
-//extension TrackerViewController: UICollectionViewDelegate {
-//    func collectionView(
-//        _ collectionView: UICollectionView,
-//        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
-//        point: CGPoint
-//    ) -> UIContextMenuConfiguration? {
-//        guard let indexPath = indexPaths.first else { return nil }
-//
-//        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
-//            guard let self = self else {
-//                return UIMenu(title: "", children: []) // пустое меню вместо nil
-//            }
-//
-//            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
-//                AnalyticsService.shared.reportEvent(event: .click, screen: .main, item: .edit)
-//                let tracker = self.visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
-//                let categoryTitle = self.visibleCategories[indexPath.section].title
-//                let completedDays = self.completedTrackers.filter { $0.id == tracker.id }.count
-//                
-//                let editViewModel = EditTrackerViewModel(tracker: tracker, category: categoryTitle, completedDays: completedDays)
-//                let editVC = EditTrackerViewController(viewModel: editViewModel)
-//                editVC.delegate = self
-//                
-//                let navController = UINavigationController(rootViewController: editVC)
-//                self.present(navController, animated: true)
-//            }
-//
-//            // Удалить
-//            let deleteAction = UIAction(
-//                title: "Удалить",
-//                image: UIImage(systemName: "trash"),
-//                attributes: .destructive
-//            ) { _ in
-//                AnalyticsService.shared.reportEvent(event: .click, screen: .main, item: .delete)
-//                let alert = UIAlertController(
-//                    title: "Удалить",
-//                    message: "Уверены что хотите удалить трекер?",
-//                    preferredStyle: .actionSheet
-//                )
-//
-//                alert.addAction(UIAlertAction(
-//                    title: "Удалить",
-//                    style: .destructive,
-//                    handler: { _ in
-//                        let trackerToDelete = self.visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
-//                        do {
-//                            try self.trackerProvider?.deleteTracker(trackerToDelete)
-//                            self.loadTrackersFromCoreData()
-//                            self.updateVisibleCategories()
-//                        } catch {
-//                            print("Ошибка при удалении трекера: \(error)")
-//                        }
-//                    }
-//                ))
-//
-//                alert.addAction(UIAlertAction(title: "Отменить", style: .cancel))
-//                self.present(alert, animated: true)
-//            }
-//
-//            return UIMenu(title: "", children: [editAction, deleteAction])
-//        }
-//    }
-//}
-
 // MARK: - UISearchBarDelegate
 
 extension TrackerViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.resignFirstResponder() // закрывает клавиатуру
+        searchBar.resignFirstResponder()
     }
 }
 
@@ -862,7 +796,6 @@ extension TrackerViewController: TrackerRecordProviderDelegate {
     func didUpdate(_ update: TrackerRecordStoreUpdate) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            // Подтягиваем актуальные записи
             self.completedTrackers = self.trackerRecordProvider?.fetchAllRecords() ?? []
             self.trackerCollection.reloadData()
         }
