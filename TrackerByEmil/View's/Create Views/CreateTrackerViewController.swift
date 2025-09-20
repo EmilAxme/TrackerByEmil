@@ -513,8 +513,10 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
                 UIView.animate(withDuration: Constants.animationDuration) {
                     if indexPath.section == 0 {
                         cell.contentView.backgroundColor = .clear
+                        self.selectedEmoji = nil
                     } else {
                         cell.layer.borderWidth = 0
+                        self.selectedColor = nil
                     }
                 }
             }

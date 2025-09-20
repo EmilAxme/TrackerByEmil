@@ -57,8 +57,18 @@ final class EditTrackerViewModel {
         onStateChanged?()
     }
     
+    func clearEmoji() {
+        selectedEmoji = nil
+        onStateChanged?()
+    }
+    
     func updateColor(_ color: UIColor) {
         selectedColor = color
+        onStateChanged?()
+    }
+    
+    func clearColor() {
+        selectedColor = nil
         onStateChanged?()
     }
     

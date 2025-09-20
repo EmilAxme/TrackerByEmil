@@ -455,8 +455,10 @@ extension EditTrackerViewController: UICollectionViewDelegate {
                 UIView.animate(withDuration: Constants.animationDuration) {
                     if indexPath.section == 0 {
                         cell.contentView.backgroundColor = .clear
+                        self.viewModel.clearEmoji()
                     } else {
                         cell.layer.borderWidth = 0
+                        self.viewModel.clearColor()
                     }
                 }
             }
