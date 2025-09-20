@@ -625,12 +625,12 @@ extension TrackerViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-
+        
         
         let isFutureDate = datePicker.date > Date()
         
         let tracker = visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
-
+        
         let isCompletedToday = completedTrackers.contains {
             $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
         }
@@ -638,13 +638,13 @@ extension TrackerViewController: UICollectionViewDataSource {
         
         cell.configure(source: tracker, isCompleted: isCompletedToday, dayCount: daysCount)
         cell.isFuture(isActive: !isFutureDate)
-
+        
         cell.onDoneButtonTapped = { [weak self] trackerId, isCompleted in
             guard let self else { return }
             let record = TrackerRecord(id: trackerId, date: self.currentDate)
             
             AnalyticsService.shared.reportEvent(event: .click, screen: .main, item: .track)
-
+            
             do {
                 if isCompleted {
                     try self.trackerRecordProvider?.addRecord(record)
@@ -656,6 +656,54 @@ extension TrackerViewController: UICollectionViewDataSource {
             } catch {
                 print("Ошибка при изменении записи: \(error)")
             }
+        }
+        
+        cell.onEditTapped = { [weak self] in
+            guard let self else { return }
+            AnalyticsService.shared.reportEvent(event: .click, screen: .main, item: .edit)
+            
+            let categoryTitle = self.visibleCategories[indexPath.section].title
+            let completedDays = self.completedTrackers.filter { $0.id == tracker.id }.count
+            
+            let editViewModel = EditTrackerViewModel(
+                tracker: tracker,
+                category: categoryTitle,
+                completedDays: completedDays
+            )
+            let editVC = EditTrackerViewController(viewModel: editViewModel)
+            editVC.delegate = self
+            
+            let navController = UINavigationController(rootViewController: editVC)
+            self.present(navController, animated: true)
+        }
+        
+        // 👇 Удалить
+        cell.onDeleteTapped = { [weak self] in
+            guard let self else { return }
+            AnalyticsService.shared.reportEvent(event: .click, screen: .main, item: .delete)
+            
+            let alert = UIAlertController(
+                title: "Удалить",
+                message: "Уверены что хотите удалить трекер?",
+                preferredStyle: .actionSheet
+            )
+            
+            alert.addAction(UIAlertAction(
+                title: "Удалить",
+                style: .destructive,
+                handler: { _ in
+                    do {
+                        try self.trackerProvider?.deleteTracker(tracker)
+                        self.loadTrackersFromCoreData()
+                        self.updateVisibleCategories()
+                    } catch {
+                        print("Ошибка при удалении трекера: \(error)")
+                    }
+                }
+            ))
+            
+            alert.addAction(UIAlertAction(title: "Отменить", style: .cancel))
+            self.present(alert, animated: true)
         }
         return cell
     }
@@ -718,69 +766,69 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
 
 // MARK: - UICollectionViewDelegate
 
-extension TrackerViewController: UICollectionViewDelegate {
-    func collectionView(
-        _ collectionView: UICollectionView,
-        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
-        point: CGPoint
-    ) -> UIContextMenuConfiguration? {
-        guard let indexPath = indexPaths.first else { return nil }
-
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
-            guard let self = self else {
-                return UIMenu(title: "", children: []) // пустое меню вместо nil
-            }
-
-            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
-                AnalyticsService.shared.reportEvent(event: .click, screen: .main, item: .edit)
-                let tracker = self.visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
-                let categoryTitle = self.visibleCategories[indexPath.section].title
-                let completedDays = self.completedTrackers.filter { $0.id == tracker.id }.count
-                
-                let editViewModel = EditTrackerViewModel(tracker: tracker, category: categoryTitle, completedDays: completedDays)
-                let editVC = EditTrackerViewController(viewModel: editViewModel)
-                editVC.delegate = self
-                
-                let navController = UINavigationController(rootViewController: editVC)
-                self.present(navController, animated: true)
-            }
-
-            // Удалить
-            let deleteAction = UIAction(
-                title: "Удалить",
-                image: UIImage(systemName: "trash"),
-                attributes: .destructive
-            ) { _ in
-                AnalyticsService.shared.reportEvent(event: .click, screen: .main, item: .delete)
-                let alert = UIAlertController(
-                    title: "Удалить",
-                    message: "Уверены что хотите удалить трекер?",
-                    preferredStyle: .actionSheet
-                )
-
-                alert.addAction(UIAlertAction(
-                    title: "Удалить",
-                    style: .destructive,
-                    handler: { _ in
-                        let trackerToDelete = self.visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
-                        do {
-                            try self.trackerProvider?.deleteTracker(trackerToDelete)
-                            self.loadTrackersFromCoreData()
-                            self.updateVisibleCategories()
-                        } catch {
-                            print("Ошибка при удалении трекера: \(error)")
-                        }
-                    }
-                ))
-
-                alert.addAction(UIAlertAction(title: "Отменить", style: .cancel))
-                self.present(alert, animated: true)
-            }
-
-            return UIMenu(title: "", children: [editAction, deleteAction])
-        }
-    }
-}
+//extension TrackerViewController: UICollectionViewDelegate {
+//    func collectionView(
+//        _ collectionView: UICollectionView,
+//        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
+//        point: CGPoint
+//    ) -> UIContextMenuConfiguration? {
+//        guard let indexPath = indexPaths.first else { return nil }
+//
+//        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+//            guard let self = self else {
+//                return UIMenu(title: "", children: []) // пустое меню вместо nil
+//            }
+//
+//            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
+//                AnalyticsService.shared.reportEvent(event: .click, screen: .main, item: .edit)
+//                let tracker = self.visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
+//                let categoryTitle = self.visibleCategories[indexPath.section].title
+//                let completedDays = self.completedTrackers.filter { $0.id == tracker.id }.count
+//                
+//                let editViewModel = EditTrackerViewModel(tracker: tracker, category: categoryTitle, completedDays: completedDays)
+//                let editVC = EditTrackerViewController(viewModel: editViewModel)
+//                editVC.delegate = self
+//                
+//                let navController = UINavigationController(rootViewController: editVC)
+//                self.present(navController, animated: true)
+//            }
+//
+//            // Удалить
+//            let deleteAction = UIAction(
+//                title: "Удалить",
+//                image: UIImage(systemName: "trash"),
+//                attributes: .destructive
+//            ) { _ in
+//                AnalyticsService.shared.reportEvent(event: .click, screen: .main, item: .delete)
+//                let alert = UIAlertController(
+//                    title: "Удалить",
+//                    message: "Уверены что хотите удалить трекер?",
+//                    preferredStyle: .actionSheet
+//                )
+//
+//                alert.addAction(UIAlertAction(
+//                    title: "Удалить",
+//                    style: .destructive,
+//                    handler: { _ in
+//                        let trackerToDelete = self.visibleCategories[indexPath.section].trackerOfCategory[indexPath.item]
+//                        do {
+//                            try self.trackerProvider?.deleteTracker(trackerToDelete)
+//                            self.loadTrackersFromCoreData()
+//                            self.updateVisibleCategories()
+//                        } catch {
+//                            print("Ошибка при удалении трекера: \(error)")
+//                        }
+//                    }
+//                ))
+//
+//                alert.addAction(UIAlertAction(title: "Отменить", style: .cancel))
+//                self.present(alert, animated: true)
+//            }
+//
+//            return UIMenu(title: "", children: [editAction, deleteAction])
+//        }
+//    }
+//}
 
 // MARK: - UISearchBarDelegate
 
