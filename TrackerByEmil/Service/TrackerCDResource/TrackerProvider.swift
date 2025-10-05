@@ -23,7 +23,8 @@ protocol TrackerProviderProtocol {
     func numberOfRowsInSection(_ section: Int) -> Int
     func object(at indexPath: IndexPath) -> TrackerCD?
     func addTracker(_ tracker: Tracker, to category: TrackerCategoryCD) throws
-    func deleteTracker(at indexPath: IndexPath) throws
+    func deleteTracker(_ tracker: Tracker) throws
+    func updateTracker(_ tracker: Tracker, to category: TrackerCategoryCD) throws
 }
 
 final class TrackerProvider: NSObject, TrackerProviderProtocol {
@@ -84,10 +85,29 @@ final class TrackerProvider: NSObject, TrackerProviderProtocol {
         coreDataStack.saveContext()
     }
     
-    func deleteTracker(at indexPath: IndexPath) throws {
-        let tracker = fetchedResultsController.object(at: indexPath)
-        coreDataStack.context.delete(tracker)
+    func deleteTracker(_ tracker: Tracker) throws {
+        guard let trackerCD = fetchedResultsController.fetchedObjects?.first(where: { $0.id == tracker.id }) else { return }
+        coreDataStack.context.delete(trackerCD)
         coreDataStack.saveContext()
+    }
+    
+    func updateTracker(_ tracker: Tracker, to category: TrackerCategoryCD) throws {
+        let request: NSFetchRequest<TrackerCD> = TrackerCD.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
+
+        if let trackerCD = try coreDataStack.context.fetch(request).first {
+            trackerCD.name = tracker.name
+            trackerCD.emoji = tracker.emoji
+            trackerCD.color = UIColorMarshalling.hexString(from: tracker.color)
+            trackerCD.schedule = tracker.schedule.toData()
+            trackerCD.category = category
+
+            try coreDataStack.context.save()
+        } else {
+            throw NSError(domain: "TrackerError",
+                          code: 404,
+                          userInfo: [NSLocalizedDescriptionKey: "Трекер не найден для обновления"])
+        }
     }
 }
 

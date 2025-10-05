@@ -25,9 +25,10 @@ final class EditCategoryViewController: UIViewController {
         static let buttonFontSize: CGFloat = 17
         static let leftPadding: CGFloat = 16
         
-        static let textFieldPlaceholder = "Название категории"
-        static let doneButtonTitle = "Готово"
-        static let screenTitle = "Редактирование категории"
+        // Strings
+        static let textFieldPlaceholder = "edit_category_placeholder".localized
+        static let doneButtonTitle = "done_title".localized
+        static let screenTitle = "edit_category_screen_title".localized
     }
     
     // MARK: - Properties
@@ -59,7 +60,8 @@ final class EditCategoryViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle(Constants.doneButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: Constants.buttonFontSize, weight: .semibold)
-        button.backgroundColor = .black
+        button.setTitleColor(UIColor(named: "White"), for: .normal)
+        button.backgroundColor = .ypBlack
         button.tintColor = .white
         button.layer.cornerRadius = Constants.buttonCornerRadius
         button.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)

@@ -8,7 +8,13 @@
 import UIKit
 
 final class TabBarController: UITabBarController {
-
+    // MARK: - Constants
+    
+    private enum Constants {
+        static let mainTabTitle = "main_tab_title".localized
+        static let statisticTabTitle = "statistic_tab_title".localized
+    }
+    
     // MARK: - Properties
     
     private let coreDataStack: CoreDataStackProtocol
@@ -49,8 +55,8 @@ final class TabBarController: UITabBarController {
         
         let statisticVC = StatisticViewController()
         
-        mainScreenVC.tabBarItem = UITabBarItem(title: "Главный", image: UIImage(resource: .mainTabItem), selectedImage: nil)
-        statisticVC.tabBarItem = UITabBarItem(title: "Статистика", image: UIImage(resource: .statTabItem), selectedImage: nil)
+        mainScreenVC.tabBarItem = UITabBarItem(title: Constants.mainTabTitle, image: UIImage(resource: .mainTabItem), selectedImage: nil)
+        statisticVC.tabBarItem = UITabBarItem(title: Constants.statisticTabTitle, image: UIImage(resource: .statTabItem), selectedImage: nil)
         
         self.viewControllers = [mainScreenVC, statisticVC]
         
@@ -59,7 +65,7 @@ final class TabBarController: UITabBarController {
     
     private func addSeparatorLine() {
         let separatorLine = UIView()
-        separatorLine.backgroundColor = .lightGray
+        separatorLine.backgroundColor = .ypLightGray
         
         view.addToView(separatorLine)
         
