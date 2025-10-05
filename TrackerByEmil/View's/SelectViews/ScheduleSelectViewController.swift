@@ -7,10 +7,13 @@
 
 import UIKit
 
+protocol ScheduleSelectViewControllerDelegate: AnyObject {
+    func didChooseSchedule(_ days: [WeekDay])
+}
+
 final class ScheduleSelectViewController: UIViewController {
     
     // MARK: - Layout Constants
-    
     private enum Constants {
         static let cornerRadius: CGFloat = 16
         static let defaultSpacing: CGFloat = 16
@@ -19,11 +22,15 @@ final class ScheduleSelectViewController: UIViewController {
         static let cellHeight: CGFloat = 75
         static let tableHeaderHeight: CGFloat = 1
         static let separatorInset: CGFloat = 16
+        
+        // Strings
+        static let readyButtonTitle = "done_title".localized
+        static let screenTitle = "schedule_screen_title".localized
     }
     
     // MARK: - Properties
     
-    var delegate: CreateTrackerViewController?
+    weak var delegate: ScheduleSelectViewControllerDelegate?
     var selectedDays: Set<WeekDay> = []
     
     //MARK: - UI Element's
@@ -53,11 +60,12 @@ final class ScheduleSelectViewController: UIViewController {
     private lazy var readyButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .ypBlack
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(Constants.readyButtonTitle, for: .normal)
         button.layer.masksToBounds = true
         button.layer.cornerRadius = Constants.cornerRadius
         button.addTarget(self, action: #selector(readyButtonTapped), for: .touchUpInside)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.setTitleColor(UIColor(named: "White"), for: .normal)
         return button
     }()
     
@@ -91,12 +99,12 @@ final class ScheduleSelectViewController: UIViewController {
     }
     
     private func setupAppearance() {
-        view.backgroundColor = .ypWhite
+        view.backgroundColor = .systemBackground
     }
     
     private func setupNavigation() {
         navigationItem.hidesBackButton = true
-        title = "Расписание"
+        title = Constants.screenTitle
     }
     
     // MARK: - Actions

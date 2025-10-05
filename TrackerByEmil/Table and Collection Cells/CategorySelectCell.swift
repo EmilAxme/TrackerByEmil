@@ -12,7 +12,11 @@ final class CategorySelectCell: UITableViewCell {
         static let horizontalInset: CGFloat = 16
     }
     
+    // MARK: - Properties
+    
     static let reuseIdentifier = "CategorySelectCell"
+    
+    // MARK: - UI Elements
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -28,6 +32,8 @@ final class CategorySelectCell: UITableViewCell {
         return iv
     }()
     
+    // MARK: - LifeCycle
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -38,10 +44,14 @@ final class CategorySelectCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Public Methods
+    
     func configure(with viewModel: CategoryCellViewModel) {
         titleLabel.text = viewModel.title
         checkmarkImageView.isHidden = !viewModel.isSelected
     }
+    
+    // MARK: - Private Methods
     
     private func setupUI() {
         [titleLabel, checkmarkImageView].forEach {

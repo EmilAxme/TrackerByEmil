@@ -7,10 +7,12 @@
 
 import UIKit
 import CoreData
+import AppMetricaCore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+    let filterStorage = FilterStorage()
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
@@ -20,7 +22,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
-        
+        let configuration = AppMetricaConfiguration(apiKey: "2cd7b5b3-a1a0-4425-b9b2-c721f8b993ec")
+        AppMetrica.activate(with: configuration!)
+        filterStorage.reset()
         window?.makeKeyAndVisible()
         return true
     }

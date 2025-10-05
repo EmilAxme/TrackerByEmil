@@ -1,40 +1,55 @@
-//
-//  CreateIrregularEventViewController.swift
-//  TrackerByEmil
-//
-//  Created by Emil on 13.07.2025.
-//
-
 import UIKit
 
-final class CreateIrregularEventViewController: UIViewController {
+final class CreateTrackerViewController: UIViewController {
     
     // MARK: - Layout Constants
     
     private enum Constants {
+        
+        // Layout
         static let cornerRadius: CGFloat = 16
         static let defaultSpacing: CGFloat = 24
-        static let mediumSpacing: CGFloat = 16
         static let smallSpacing: CGFloat = 8
+        static let mediumSpacing: CGFloat = 16
         static let largeSpacing: CGFloat = 32
         static let textFieldHeight: CGFloat = 75
         static let buttonHeight: CGFloat = 60
         static let cellHeight: CGFloat = 75
+        static let scheduleTableHeight: CGFloat = 150
+        static let collectionViewHeight: CGFloat = 500
+        static let headerHeight: CGFloat = 50
         static let sidePadding: CGFloat = 16
         static let wideSidePadding: CGFloat = 20
         static let textFieldLeftPadding: CGFloat = 16
+        static let characterCounterRightPadding: CGFloat = 16
+        static let characterCounterBottomPadding: CGFloat = 8
         static let collectionItemSize: CGFloat = 52
         static let collectionSectionInset: CGFloat = 18
         static let collectionHeaderTopInset: CGFloat = 24
-        static let collectionViewHeight: CGFloat = 500
-        static let headerHeight: CGFloat = 50
-        static let emojiCornerRadius: CGFloat = 16
         static let colorBorderWidth: CGFloat = 3
         static let colorCornerRadius: CGFloat = 10
+        static let emojiCornerRadius: CGFloat = 16
+        static let maxCharacterCount: Int = 38
         static let animationDuration: TimeInterval = 0.3
+        
+        static let titleNewHabit = "new_habit_title".localized
+        static let placeholderName = "tracker_name_placeholder".localized
+        static let cancelButtonTitle = "cancel_button".localized
+        static let createButtonTitle = "create_button".localized
+        static let categoryTitle = "category_title".localized
+        static let scheduleTitle = "schedule_title".localized
+        static let everyDay = "every_day".localized
+        static let chooseOrCreate = "choose_or_create".localized
+        static let emojiHeader = "emoji_header".localized
+        static let colorHeader = "color_header".localized
+        
+        static func charLimit(_ limit: Int) -> String {
+            String(format: "character_limit".localized, limit)
+        }
     }
     
     // MARK: - Properties
+    
     private let emojis = [
         "🙂", "😻", "🌺", "🐶", "❤️", "😱",
         "😇", "😡", "🥶", "🤔", "🙌", "🍔",
@@ -55,8 +70,10 @@ final class CreateIrregularEventViewController: UIViewController {
     
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
+    var selectedScheduleDays: [WeekDay] = []
+    var selectedCategory = ""
+    
     private var isFormValid: Bool = false
-    private var allDays: [WeekDay] = [.friday, .saturday, .sunday, .monday, .tuesday, .wednesday, .thursday]
     var delegate: TrackerViewController?
     
     // MARK: - UI Elements
@@ -66,9 +83,19 @@ final class CreateIrregularEventViewController: UIViewController {
         return scrollView
     }()
     
+    private lazy var characterCounterLabel: UILabel = {
+        let label = UILabel()
+        label.text = Constants.charLimit(Constants.maxCharacterCount)
+        label.font = .systemFont(ofSize: 13)
+        label.textColor = .ypGray
+        label.textAlignment = .right
+        label.alpha = 0
+        return label
+    }()
+    
     private lazy var trackerNameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = Constants.placeholderName
         textField.backgroundColor = .ypBackground
         textField.layer.cornerRadius = Constants.cornerRadius
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: Constants.textFieldLeftPadding, height: textField.frame.height))
@@ -76,24 +103,30 @@ final class CreateIrregularEventViewController: UIViewController {
         textField.clearButtonMode = .whileEditing
         textField.returnKeyType = .done
         textField.delegate = self
+        textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         return textField
     }()
     
-    private lazy var categoryTableView: UITableView = {
+    private lazy var textFieldContainer: UIView = {
+        let view = UIView()
+        return view
+    }()
+    
+    private lazy var categoryAndScheduleTableView: UITableView = {
         let tableView = UITableView()
         tableView.layer.cornerRadius = Constants.cornerRadius
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: Constants.sidePadding, bottom: 0, right: Constants.sidePadding)
         tableView.isScrollEnabled = false
         tableView.dataSource = self
         tableView.delegate = self
         tableView.backgroundColor = .ypGray
+        tableView.register(ScheduleCell.self, forCellReuseIdentifier: ScheduleCell.reusableIdentifier)
         tableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.reusableIdentifier)
-        tableView.separatorStyle = .none
-        tableView.tableFooterView = UIView()
         return tableView
     }()
     
     private lazy var emojiAndColorCollectionView: UICollectionView = {
-        var layout = UICollectionViewFlowLayout()
+        let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: Constants.collectionItemSize, height: Constants.collectionItemSize)
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
@@ -117,7 +150,7 @@ final class CreateIrregularEventViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(Constants.cancelButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .clear
         button.layer.borderWidth = 1
@@ -125,17 +158,16 @@ final class CreateIrregularEventViewController: UIViewController {
         button.layer.cornerRadius = Constants.cornerRadius
         button.setTitleColor(.ypRed, for: .normal)
         button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     private lazy var createButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Создать", for: .normal)
+        let button = UIButton(type: .system)
+        button.setTitle(Constants.createButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .ypGray
-        button.layer.cornerRadius = Constants.cornerRadius
         button.setTitleColor(.ypWhite, for: .normal)
+        button.layer.cornerRadius = Constants.cornerRadius
         button.isEnabled = false
         button.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
         return button
@@ -153,69 +185,68 @@ final class CreateIrregularEventViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
         setupAppearance()
         setupNavigation()
+        setupUI()
     }
     
     // MARK: - Private Methods
     
+    private func setupAppearance() {
+        view.backgroundColor = .systemBackground
+    }
+    
+    private func setupNavigation() {
+        title = Constants.titleNewHabit
+        navigationItem.hidesBackButton = true
+    }
+    
     private func setupUI() {
         view.addToView(scrollView)
-
-        [trackerNameTextField,
-         categoryTableView,
-         emojiAndColorCollectionView,
-         buttonsStackView].forEach {
-            scrollView.addToView($0)
-        }
-
+        
+        textFieldContainer.addToView(trackerNameTextField)
+        textFieldContainer.addToView(characterCounterLabel)
+        
+        scrollView.addToView(textFieldContainer)
+        scrollView.addToView(categoryAndScheduleTableView)
+        scrollView.addToView(emojiAndColorCollectionView)
+        scrollView.addToView(buttonsStackView)
+        
         NSLayoutConstraint.activate([
-            
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-
-            trackerNameTextField.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: Constants.defaultSpacing),
-            trackerNameTextField.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Constants.sidePadding),
-            trackerNameTextField.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Constants.sidePadding),
+            
+            textFieldContainer.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: Constants.defaultSpacing),
+            textFieldContainer.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Constants.sidePadding),
+            textFieldContainer.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Constants.sidePadding),
+            textFieldContainer.heightAnchor.constraint(equalToConstant: Constants.textFieldHeight),
+            
+            trackerNameTextField.topAnchor.constraint(equalTo: textFieldContainer.topAnchor),
+            trackerNameTextField.leadingAnchor.constraint(equalTo: textFieldContainer.leadingAnchor),
+            trackerNameTextField.trailingAnchor.constraint(equalTo: textFieldContainer.trailingAnchor),
             trackerNameTextField.heightAnchor.constraint(equalToConstant: Constants.textFieldHeight),
-
-            categoryTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: Constants.defaultSpacing),
-            categoryTableView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Constants.sidePadding),
-            categoryTableView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Constants.sidePadding),
-            categoryTableView.heightAnchor.constraint(equalToConstant: Constants.cellHeight),
-
-            emojiAndColorCollectionView.topAnchor.constraint(equalTo: categoryTableView.bottomAnchor, constant: Constants.largeSpacing),
+            
+            characterCounterLabel.trailingAnchor.constraint(equalTo: textFieldContainer.trailingAnchor, constant: -Constants.characterCounterRightPadding),
+            characterCounterLabel.bottomAnchor.constraint(equalTo: textFieldContainer.bottomAnchor, constant: -Constants.characterCounterBottomPadding),
+            
+            categoryAndScheduleTableView.topAnchor.constraint(equalTo: textFieldContainer.bottomAnchor, constant: Constants.defaultSpacing),
+            categoryAndScheduleTableView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Constants.sidePadding),
+            categoryAndScheduleTableView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Constants.sidePadding),
+            categoryAndScheduleTableView.heightAnchor.constraint(equalToConstant: Constants.scheduleTableHeight),
+            
+            emojiAndColorCollectionView.topAnchor.constraint(equalTo: categoryAndScheduleTableView.bottomAnchor, constant: Constants.largeSpacing),
             emojiAndColorCollectionView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Constants.sidePadding),
             emojiAndColorCollectionView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Constants.sidePadding),
             emojiAndColorCollectionView.heightAnchor.constraint(equalToConstant: Constants.collectionViewHeight),
-
+            
             buttonsStackView.topAnchor.constraint(equalTo: emojiAndColorCollectionView.bottomAnchor, constant: Constants.mediumSpacing),
             buttonsStackView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Constants.wideSidePadding),
             buttonsStackView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Constants.wideSidePadding),
-            buttonsStackView.heightAnchor.constraint(equalToConstant: Constants.buttonHeight),
-            buttonsStackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -Constants.defaultSpacing)
+            buttonsStackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            buttonsStackView.heightAnchor.constraint(equalToConstant: Constants.buttonHeight)
         ])
-    }
-    
-    private func setupAppearance() {
-        view.backgroundColor = .ypWhite
-    }
-    
-    private func setupNavigation() {
-        title = "Новое нерегулярное событие"
-        navigationItem.hidesBackButton = true
-    }
-    
-    private func updateCreateButtonState() {
-        let isNameEntered = !(trackerNameTextField.text?.isEmpty ?? true)
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.createButton.isEnabled = isNameEntered
-            self.createButton.backgroundColor = isNameEntered ? .ypBlack : .ypGray
-        }
     }
     
     private func createTracker() -> Tracker? {
@@ -230,23 +261,40 @@ final class CreateIrregularEventViewController: UIViewController {
             name: trackerName,
             color: selectedColor,
             emoji: selectedEmoji,
-            schedule: allDays
+            schedule: selectedScheduleDays
         )
     }
+    
     // MARK: - Actions
     
     @objc private func cancelButtonTapped() {
+        delegate?.loadTrackersFromCoreData()
         dismiss(animated: true)
     }
     
     @objc private func createButtonTapped() {
         guard let tracker = createTracker() else { return }
+        let categoryName = selectedCategory
+        delegate?.loadTrackersFromCoreData()
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.delegate?.addNewTracker(tracker, to: "Важное")
+            self.delegate?.addNewTracker(tracker, to: categoryName)
             self.dismiss(animated: true)
         }
+    }
+    
+    @objc private func textFieldDidChange(_ textField: UITextField) {
+        guard let text = textField.text else { return }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            UIView.animate(withDuration: Constants.animationDuration) {
+                self.characterCounterLabel.alpha = text.count >= Constants.maxCharacterCount ? 1 : 0
+            }
+        }
+        
+        updateCreateButtonStateIfNeeded()
     }
     
     // MARK: - Update UI
@@ -255,15 +303,17 @@ final class CreateIrregularEventViewController: UIViewController {
         let isNameEntered = !(trackerNameTextField.text?.isEmpty ?? true)
         let isEmojiSelected = selectedEmoji != nil
         let isColorSelected = selectedColor != nil
+        let isScheduleSelected = !selectedScheduleDays.isEmpty
+        let trackerCategorySelected = !selectedCategory.isEmpty
         
-        let isFormNowValid = isNameEntered && isEmojiSelected && isColorSelected
+        let isFormNowValid = isNameEntered && isEmojiSelected && isColorSelected && isScheduleSelected && trackerCategorySelected
         
         if isFormNowValid != isFormValid {
             isFormValid = isFormNowValid
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 self.createButton.isEnabled = isFormNowValid
-                self.createButton.backgroundColor = isFormNowValid ? .ypBlack : .ypGray
+                self.createButton.backgroundColor = isFormNowValid ? .black : .ypGray
             }
         }
     }
@@ -271,56 +321,115 @@ final class CreateIrregularEventViewController: UIViewController {
 
 // MARK: - UITextFieldDelegate
 
-extension CreateIrregularEventViewController: UITextFieldDelegate {
+extension CreateTrackerViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }
     
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+        
+        return updatedText.count <= Constants.maxCharacterCount
+    }
+    
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        updateCreateButtonState()
+        updateCreateButtonStateIfNeeded()
     }
 }
 
 // MARK: - UITableViewDataSource
 
-extension CreateIrregularEventViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reusableIdentifier, for: indexPath) as? CategoryCell else {
-            return UITableViewCell()
-        }
-        cell.titleLabel.text = "Категория"
-        cell.descriptionLabel.text = "Важное"
-        cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
-        return cell
+extension CreateTrackerViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 2
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        1
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if selectedScheduleDays.isEmpty {
+            if indexPath.row == 0 {
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reusableIdentifier, for: indexPath) as? CategoryCell else {
+                    return UITableViewCell()
+                }
+                cell.titleLabel.text = Constants.categoryTitle
+                cell.descriptionLabel.text = selectedCategory.isEmpty ? Constants.chooseOrCreate : selectedCategory
+                return cell
+            } else {
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleCell.reusableIdentifier, for: indexPath) as? ScheduleCell else {
+                    return UITableViewCell()
+                }
+                cell.titleLabel.text = Constants.scheduleTitle
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+                return cell
+            }
+        } else {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reusableIdentifier, for: indexPath) as? CategoryCell else {
+                return UITableViewCell()
+            }
+            if indexPath.row == 0 {
+                cell.titleLabel.text = Constants.categoryTitle
+                cell.descriptionLabel.text = selectedCategory.isEmpty ? Constants.chooseOrCreate : selectedCategory
+                return cell
+            } else {
+                cell.titleLabel.text = Constants.scheduleTitle
+                if selectedScheduleDays.count == 7 {
+                    cell.descriptionLabel.text = Constants.everyDay
+                } else {
+                    cell.descriptionLabel.text = selectedScheduleDays
+                        .map { $0.shortName }
+                        .joined(separator: ", ")
+                    cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+                }
+                return cell
+            }
+        }
     }
 }
 
 // MARK: - UITableViewDelegate
 
-extension CreateIrregularEventViewController: UITableViewDelegate {
+extension CreateTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        Constants.cellHeight
+        return Constants.cellHeight
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        if indexPath.row == 0 {
+            guard let coreDataStack = (delegate)?.coreDataStack else { return }
+            let store = TrackerCategoryStore(context: coreDataStack.context)
+            let vm = CategorySelectViewModel(store: store)
+            let categorySelectViewController = CategorySelectViewController(viewModel: vm)
+            categorySelectViewController.delegate = self
+            present(UINavigationController(rootViewController: categorySelectViewController), animated: true)
+        } else {
+            let scheduleSelectViewController = ScheduleSelectViewController()
+            scheduleSelectViewController.delegate = self
+            scheduleSelectViewController.selectedDays = Set(selectedScheduleDays)
+            present(UINavigationController(rootViewController: scheduleSelectViewController), animated: true)
+        }
     }
 }
 
+
 // MARK: - UICollectionViewDataSource
 
-extension CreateIrregularEventViewController: UICollectionViewDataSource {
+extension CreateTrackerViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         2
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        section == 0 ? emojis.count : colors.count
+        return section == 0 ? emojis.count : colors.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerEmojiColorCell.reuseIdentifier, for: indexPath) as? TrackerEmojiColorCell else {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: TrackerEmojiColorCell.reuseIdentifier,
+            for: indexPath
+        ) as? TrackerEmojiColorCell else {
             return UICollectionViewCell()
         }
         
@@ -334,18 +443,22 @@ extension CreateIrregularEventViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: HeaderTrackerEmojiColorSection.reuseIdentifier, for: indexPath) as? HeaderTrackerEmojiColorSection else {
+        guard let header = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: HeaderTrackerEmojiColorSection.reuseIdentifier,
+            for: indexPath
+        ) as? HeaderTrackerEmojiColorSection else {
             return UICollectionReusableView()
         }
         
-        headerView.categoryTitle.text = indexPath.section == 0 ? "Emoji" : "Color"
-        return headerView
+        header.categoryTitle.text = indexPath.section == 0 ? Constants.emojiHeader : Constants.colorHeader
+        return header
     }
 }
 
 // MARK: - UICollectionViewDelegate
 
-extension CreateIrregularEventViewController: UICollectionViewDelegate {
+extension CreateTrackerViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -389,7 +502,6 @@ extension CreateIrregularEventViewController: UICollectionViewDelegate {
                     }
                 }
             }
-            
             self.updateCreateButtonStateIfNeeded()
         }
     }
@@ -401,8 +513,10 @@ extension CreateIrregularEventViewController: UICollectionViewDelegate {
                 UIView.animate(withDuration: Constants.animationDuration) {
                     if indexPath.section == 0 {
                         cell.contentView.backgroundColor = .clear
+                        self.selectedEmoji = nil
                     } else {
                         cell.layer.borderWidth = 0
+                        self.selectedColor = nil
                     }
                 }
             }
@@ -413,8 +527,34 @@ extension CreateIrregularEventViewController: UICollectionViewDelegate {
 
 // MARK: - UICollectionViewDelegateFlowLayout
 
-extension CreateIrregularEventViewController: UICollectionViewDelegateFlowLayout {
+extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.bounds.width, height: Constants.headerHeight)
+    }
+}
+
+// MARK: - CategorySelectViewControllerDelegate
+
+extension CreateTrackerViewController: CategorySelectViewControllerDelegate {
+    func didSelectCategory(_ category: TrackerCategoryCD) {
+        self.selectedCategory = category.title ?? ""
+        DispatchQueue.main.async {
+            self.categoryAndScheduleTableView.reloadData()
+            self.updateCreateButtonStateIfNeeded()
+        }
+    }
+}
+
+// MARK: - ScheduleSelectViewControllerDelegate
+
+extension CreateTrackerViewController: ScheduleSelectViewControllerDelegate {
+    func didChooseSchedule(_ days: [WeekDay]) {
+        selectedScheduleDays = days
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.categoryAndScheduleTableView.reloadData()
+
+        }
+        self.updateCreateButtonStateIfNeeded()
     }
 }

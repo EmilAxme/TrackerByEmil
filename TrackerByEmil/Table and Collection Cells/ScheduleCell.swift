@@ -19,8 +19,6 @@ final class ScheduleCell: UITableViewCell {
     
     static let reusableIdentifier = "ScheduleCell"
     
-
-    
     // MARK: - UI Elements
     
     lazy var titleLabel: UILabel = {
